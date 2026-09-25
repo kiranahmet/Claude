@@ -143,7 +143,7 @@ def table6():
             rows.append(f"<tr><td></td><td class='l'>{e(cat)}</td><td class='c'>{b}</td><td class='c'>{se}</td><td class='c'>{w}</td><td class='c'>{p}</td><td class='c'>{ex}</td></tr>")
     return f"""
 <div class="tbl"><div class="cap"><b>Tablo 6.</b> Sigara bırakma durumunu öngören tedavi yöntemleri ve ilişkili özelliklerin ileri analizi (lojistik regresyon)</div>
-<table><thead><tr><th class='l'>Değişken</th><th class='l'>Kategori</th><th>B<br>(Katsayı)</th><th>S.H.<br>(Standart hata)</th><th>Wald χ<sup>2</sup></th><th>p değeri</th><th>Exp(B)<br>(Olasılık oranı)</th></tr></thead>
+<table><thead><tr><th class='l'>Değişken</th><th class='l'>Kategori</th><th>B<br>(Katsayı)</th><th>S.H.<br>(Standart hata)</th><th>Wald χ<sup>2</sup></th><th>p değeri</th><th>Exp(B)<br>(Odds oranı)</th></tr></thead>
 <tbody>{''.join(rows)}</tbody></table></div>"""
 
 
