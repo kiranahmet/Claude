@@ -5,7 +5,7 @@ const path = require('path');
   const page = await browser.newPage();
   await page.goto('file://' + path.resolve('ceviri.html'), { waitUntil: 'load' });
   const hdr = `<div style="width:100%;font-family:'Liberation Sans',sans-serif;font-size:7.5pt;font-style:italic;color:#222;padding:0 22mm;display:flex;justify-content:space-between;margin-top:9mm;">
-     <span>Turk J Fam Pract 2026;30(2):97-106</span><span>Cenberlitaş E, ve ark. Sigara Bırakma Durumu (Türkçe çeviri)</span></div>`;
+     <span>Turk J Fam Pract 2026;30(2):97-106</span><span>Cenberlitaş E ve ark. Sigara Bırakma Durumu (Türkçe çeviri)</span></div>`;
   const ftr = `<div style="width:100%;font-family:'Liberation Sans',sans-serif;font-size:8pt;font-weight:bold;color:#222;padding:0 22mm;text-align:right;margin-bottom:7mm;"><span class="pageNumber"></span></div>`;
   await page.pdf({
     path: 'ceviri.pdf',

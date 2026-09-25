@@ -93,7 +93,7 @@ def table2():
             rows.append(f"<tr><td class='l ind'>{e(cat)}</td><td class='c'>{u}</td><td class='c'>{s}</td><td></td></tr>")
     return f"""
 <div class="tbl"><div class="cap"><b>Tablo 2.</b> Hastaların sosyodemografik özelliklerine göre sigara bırakma sonuçlarının karşılaştırılması</div>
-<table><thead><tr><th class='l'></th><th>Başarısız<br>n (%)</th><th>Başarılı<br>n (%)</th><th>p</th></tr></thead>
+<table><thead><tr><th class='l'>Özellik</th><th>Başarısız<br>n (%)</th><th>Başarılı<br>n (%)</th><th>p</th></tr></thead>
 <tbody>{''.join(rows)}</tbody></table></div>"""
 
 
@@ -101,12 +101,12 @@ def table3():
     rows = []
     for a, b, n, pct in T3_main:
         rows.append(f"<tr><td class='l'>{e(a)}</td><td class='l'>{e(b)}</td><td class='c'>{n}</td><td class='c'>({pct})</td></tr>")
-    rows.append("<tr><td class='l' colspan='2'>Özgül kombine tedavi seçenekleri (Toplam n=141)</td><th>n</th><th>%</th></tr>")
+    rows.append("<tr><td class='l' colspan='2'>Spesifik kombine tedavi seçenekleri (Toplam n=141)</td><th>n</th><th>%</th></tr>")
     for b, n, pct in T3_comb:
         rows.append(f"<tr><td></td><td class='l'>{e(b)}</td><td class='c'>{n}</td><td class='c'>({pct})</td></tr>")
     return f"""
 <div class="tbl"><div class="cap"><b>Tablo 3.</b> Katılımcıların kullandığı tedavi seçenekleri</div>
-<table><thead><tr><th class='l'>Tedavi kategorisi</th><th class='l'>Özgül tedavi</th><th>n</th><th>%</th></tr></thead>
+<table><thead><tr><th class='l'>Tedavi kategorisi</th><th class='l'>Spesifik tedavi</th><th>n</th><th>%</th></tr></thead>
 <tbody>{''.join(rows)}</tbody></table></div>"""
 
 
@@ -116,7 +116,7 @@ def table4():
         for i, (st, m, med) in enumerate(items):
             rows.append(f"<tr><td class='l'>{e(ch) if i == 0 else ''}</td><td class='l'>{st}</td><td class='c'>{m}</td><td class='c'>{med}</td><td class='c'>{p if i == 0 else ''}</td></tr>")
     return f"""
-<div class="tbl"><div class="cap"><b>Tablo 4.</b> Özgül sigara içme ve tedavi parametrelerinin sigara bırakma durumu ile karşılaştırılması</div>
+<div class="tbl"><div class="cap"><b>Tablo 4.</b> Sigara içme ve tedaviye ilişkin belirli parametrelerin sigara bırakma durumu ile karşılaştırılması</div>
 <table><thead><tr><th class='l'>Özellik</th><th class='l'>Bırakma durumu</th><th>Ortalama ± SS</th><th>Ortanca (Min–Maks)</th><th>p değeri</th></tr></thead>
 <tbody>{''.join(rows)}</tbody></table></div>"""
 
@@ -157,7 +157,7 @@ ABSTRACT = """
 <div class="abs-title">ÖZ</div>
 <p><b>Amaç:</b> Sigara bağımlılığı, önlenebilir ölüm nedenlerinin başında gelen ve tüm yaş gruplarını etkileyen ciddi bir halk sağlığı sorunudur. Çalışmamızda, bir üniversite hastanesine bağlı sigara bırakma polikliniğine başvuran hastaların demografik ve klinik özelliklerinin ve sigara bırakma durumlarını etkileyen faktörlerin incelenmesi amaçlanmıştır.</p>
 <p><b>Yöntem:</b> Bu çalışma retrospektif, kesitsel bir çalışmadır. 01 Ağustos 2020 ile 31 Ağustos 2024 tarihleri arasında Samsun Eğitim ve Araştırma Hastanesi'ne bağlı sigara bırakma polikliniğine başvuran hastaların yaş, cinsiyet, meslek, kronik hastalık durumu, uygulanan tedaviler, sigara içme öyküleri ve Fagerström puanları, kişisel bilgileri paylaşılmaksızın hastane otomasyon sistemi aracılığıyla elde edilmiştir. Veriler SPSS paket programı kullanılarak analiz edilmiştir.</p>
-<p><b>Bulgular:</b> Çalışmaya toplam 399 hasta dahil edildi. Hastaların %63,66'sı (n=275) erkekti. Hastaların ortalama Fagerström puanı 5,66±2,43 olarak hesaplandı. Hastalarla kişi başına ortalama 2,21±1,28 görüşme yapıldı. Hastaların ortalama sigara içme süresi 27,38±16,57 paket-yıl olarak hesaplandı. Hastaların %35,19'unda (n=141) kombine tedavi başlandı. Kombine tedavi olarak hastaların %88,15'ine (n=134) Bupropion ve Nikotin Replasman Tedavisi (NRT) kombinasyonu başlandı. Tedavi sonucunda hastaların %34,09'u (n=136) sigarayı bıraktı. Bupropion monoterapisi, sigara bırakmada en az etkili ilaç olarak bulundu (p=0,01). Kombine tedavi alan hastalarda sigara bırakma oranı diğer tedavi seçeneklerine göre daha yüksek bulundu (p<0,001). Sigarayı bırakan hastaların Fagerström puanı bırakmayanlara göre anlamlı derecede düşükken (p=0,024), hasta başına düşen bireysel görüşme sayısı (p<0,001) anlamlı derecede yüksekti. Sigarayı bırakan ve hanesinde başka sigara içen bulunan hastaların oranı, bırakmayanlara göre daha düşüktü (p=0,003).</p>
+<p><b>Bulgular:</b> Çalışmaya toplam 399 hasta dahil edildi. Hastaların %63,66'sı (n=275) erkekti. Hastaların ortalama Fagerström puanı 5,66±2,43 olarak hesaplandı. Hasta başına ortalama 2,21±1,28 görüşme yapıldı. Hastaların ortalama sigara içme süresi 27,38±16,57 paket-yıl olarak hesaplandı. Hastaların %35,19'unda (n=141) kombine tedavi başlandı. Kombine tedavi olarak hastaların %88,15'ine (n=134) Bupropion ve Nikotin Replasman Tedavisi (NRT) kombinasyonu başlandı. Tedavi sonucunda hastaların %34,09'u (n=136) sigarayı bıraktı. Bupropion monoterapisi, sigara bırakmada en az etkili ilaç olarak bulundu (p=0,01). Kombine tedavi alan hastalarda sigara bırakma oranı diğer tedavi seçeneklerine göre daha yüksek bulundu (p<0,001). Sigarayı bırakan hastaların Fagerström puanı bırakmayanlara göre anlamlı derecede düşükken (p=0,024), hasta başına düşen bireysel görüşme sayısı (p<0,001) anlamlı derecede yüksekti. Hanesinde sigara içen başka birinin bulunduğu hastaların oranı, sigarayı bırakanlarda bırakmayanlara göre daha düşüktü (p=0,003).</p>
 <p><b>Sonuç:</b> Hastaların yaklaşık üçte birinin sigarayı bıraktığı gözlendi. Kombine tedavi kullanan hastaların sigara bırakma oranı diğer tedavi seçeneklerine göre daha yüksek bulundu.</p>
 <p><b>Anahtar kelimeler:</b> bupropion, nikotin replasman tedavisi, sigara bırakma, sitizin, vareniklin</p>
 </div>"""
@@ -167,16 +167,16 @@ INTRO = f"""
 <p>Tütün bağımlılığı, tüm yaş gruplarını etkileyen önemli bir halk sağlığı sorunudur ve dünya genelinde önlenebilir ölüm nedenlerinin başında gelmeye devam etmektedir.{r(1)} Düşük ve orta gelirli ülkelerdeki erken ölümlerin yaklaşık %80'inden sorumludur.{r(2,3)} Küresel Yetişkin Tütün Araştırması Türkiye 2016 verilerine göre sigara içme prevalansı erkeklerde %44,1, kadınlarda %19,2'dir.{r(4)}</p>
 <p>Sigara bırakmada bireyin kararı, tutumları ve davranışları belirleyici rol oynar. Profesyonel yardım gerektiğinde yapılandırılmış tedavi, bırakma şansını büyük ölçüde artırır.{r(5)} Bununla birlikte sigara bırakma danışmanlığı sunmak, nikotin bağımlılığının kendisi kadar karmaşık ve zorludur. Türkiye'de 500'den fazla sigara bırakma polikliniği hizmet vermekte olup 2,5 milyondan fazla kişi sigara bırakma danışmanlığı almak için başvurmuştur.{r(6)} Türkiye'de sigara bırakma polikliniklerine başvuran bireylerin bırakma oranları %20 ile %50 arasında değişmektedir.{r(7)}</p>
 <p>Türkiye'de düşük nikotin bağımlılığı, sağlık profesyonelleri tarafından düzenli takip, farmakolojik tedaviye uyum ve güçlü sosyal destek dahil olmak üzere birçok faktör sigara bırakma başarısını etkilemektedir.{r(8,9)}</p>
-<p>Tedavi stratejileri hem davranışsal yaklaşımlardan hem de farmakoterapiden oluşur. Sağlık İnanç Modeli, Sağlık Kontrol Odağı, Yeniliklerin Yayılımı Modeli, Pender'in Sağlığı Geliştirme Modeli ve Transteorik Model, yaygın olarak uygulanan davranış değişikliği modelleri arasındadır.{r(10,11)} Farmakoterapi temel olarak nikotin replasman tedavisi (NRT – transdermal bant, sakız, burun spreyi, inhaler, dil altı tablet ve pastil), bupropion ve vareniklinden oluşur. Sitizin yakın zamanda ek bir farmakoterapi seçeneği olarak kullanıma sunulmuştur.{r(12)} Farmakoterapi uygulanırken ideal olarak davranışsal müdahalelerle desteklenmeli ve gerektiğinde kombinasyon tedavileri düşünülmelidir.{r(5)}</p>
+<p>Tedavi stratejileri hem davranışsal yaklaşımlardan hem de farmakoterapiden oluşur. Sağlık İnanç Modeli, Sağlık Kontrol Odağı, Yeniliklerin Yayılımı Modeli, Pender'in Sağlığı Geliştirme Modeli ve Transteorik Model, yaygın olarak uygulanan davranış değişikliği modelleri arasındadır.{r(10,11)} Farmakoterapi temel olarak nikotin replasman tedavisi (NRT – transdermal bant, sakız, burun spreyi, inhaler, dil altı tablet ve pastil), bupropion ve vareniklinden oluşur. Sitizin yakın zamanda ek bir farmakoterapi seçeneği olarak kullanıma sunulmuştur.{r(12)} Farmakoterapi uygulanırken ideal olarak davranışsal müdahalelerle desteklenmeli ve gerektiğinde kombine tedaviler düşünülmelidir.{r(5)}</p>
 <p>Bu çalışmada, bir üniversite hastanesi sigara bırakma polikliniğine başvuran bireylerde kombine tedavi ve yakın takibin sigara bırakma başarısı üzerindeki etkisini değerlendirmeyi amaçladık. Bu hastaların özelliklerini ve bırakma sonuçlarını etkileyen faktörleri analiz ederek, gelecekte başvuracak kişiler için tedavi kararlarına yol gösterebilecek kanıtlar sunmayı hedefliyoruz.</p>
 
 <h2>Gereç ve Yöntem</h2>
 <h3>Çalışma tasarımı ve popülasyonu</h3>
 <p>Bu çalışma kesitsel, retrospektif bir analiz olarak tasarlandı. Çalışma popülasyonu, 1 Ağustos 2020 ile 31 Ağustos 2024 tarihleri arasında Samsun Eğitim ve Araştırma Hastanesi Sigara Bırakma Polikliniği'ne gönüllü olarak başvuran, sigara içen ve ≥18 yaşındaki 432 hastadan oluştu. Mevcut tüm hasta kayıtları dahil edildiğinden örneklem büyüklüğü hesaplaması yapılmadı.</p>
 <h3>Veri toplama</h3>
-<p>Yaş, cinsiyet, meslek, alkol kullanımı, kronik hastalık varlığı, tedavi yöntemleri ve sigara öyküsü (paket-yıl) dahil demografik ve klinik veriler hastaların tıbbi kayıtlarından elde edildi. Her hastanın, ilk görüşmeye ve sonraki takip seanslarına ait verilerin belgelendiği bireysel bir dosyası vardı. Sigara bırakma danışmanlığı, sigara bırakma tedavisi sertifikası bulunan hekimler ve eğitimli asistan hekimler tarafından verildi.</p>
+<p>Yaş, cinsiyet, meslek, alkol kullanımı, kronik hastalık varlığı, tedavi yöntemleri ve sigara öyküsü (paket-yıl) dahil demografik ve klinik veriler hastaların tıbbi kayıtlarından elde edildi. Her hastanın, ilk görüşmeye ve sonraki takip seanslarına ait verilerin belgelendiği bireysel bir dosyası vardı. Sigara bırakma danışmanlığı, sigara bırakma tedavisi sertifikasına sahip hekimler ve eğitim almış asistan hekimler tarafından verildi.</p>
 <p>İlk vizitte nikotin bağımlılığı, Fagerström Nikotin Bağımlılık Testi (FNBT; Fagerström Test for Nicotine Dependence, FTND) ile değerlendirildi. 0–2 puan düşük, 3–7 puan orta ve 8–10 puan yüksek bağımlılık olarak sınıflandırıldı.{r(13)} FNBT'nin Türkçe geçerlik ve güvenilirlik çalışması 2004 yılında Uysal ve ark. tarafından yapılmış olup Cronbach alfa değeri 0,56 olarak bildirilmiştir.{r(14)}</p>
-<p>Tedavi stratejileri FNBT puanlarına, kronik hastalık durumuna, eşzamanlı ilaç kullanımına, farmakoterapi kontrendikasyonlarına ve hasta uyumuna göre bireyselleştirildi. Hastalar yalnızca davranışsal tedavi, monoterapi (vareniklin, bupropion, sitizin, nikotin replasman tedavisi [NRT]) veya kombinasyon tedavisi (bupropion+NRT, vareniklin+NRT, sitizin+NRT ya da üçlü tedavi) aldı. Sağlık Bakanlığı politikaları doğrultusunda NRT ve sitizin belirli dönemlerde ücretsiz olarak sağlandı. Takip vizitleri hasta dosyalarına kaydedildi.</p>
+<p>Tedavi stratejileri FNBT puanlarına, kronik hastalık durumuna, eşzamanlı ilaç kullanımına, farmakoterapi kontrendikasyonlarına ve hasta uyumuna göre bireyselleştirildi. Hastalar yalnızca davranışsal tedavi, monoterapi (vareniklin, bupropion, sitizin, nikotin replasman tedavisi [NRT]) veya kombine tedavi (bupropion+NRT, vareniklin+NRT, sitizin+NRT ya da üçlü tedavi) aldı. Sağlık Bakanlığı politikaları doğrultusunda NRT ve sitizin belirli dönemlerde ücretsiz olarak sağlandı. Takip vizitleri hasta dosyalarına kaydedildi.</p>
 <p>432 hasta dosyası mevcut olmasına rağmen 399 hastanın verilerine eksiksiz ulaşılabildi ve bu hastalar nihai analize dahil edildi. 31 Ağustos 2024 itibarıyla en az bir yıllık takibini tamamlamamış olan hastalar ile sigarayı bırakamayan hastalar analiz dışı bırakıldı. Yıllık kontrol vizitlerini kaçıran hastaların takip bilgileri, asistan hekimler tarafından yapılan uzaktan görüşmelerle elde edildi.</p>
 <h3>Etik hususlar</h3>
 <p>Çalışma protokolü için Etik Kurul onayı Samsun Üniversitesi Tıp Fakültesi'nden alındı (Onay No: 2023/18/10, tarih: 4 Ekim 2023). Tüm hastalardan ilk başvurularında yazılı bilgilendirilmiş onam alındı.</p>
@@ -184,22 +184,22 @@ INTRO = f"""
 <p>İstatistiksel analizler SPSS 25.0 sürümü kullanılarak yapıldı. Dağılımın normalliği histogram grafikleri ve Kolmogorov–Smirnov testi ile değerlendirildi. Tanımlayıcı istatistikler ortalama ± standart sapma, ortanca ve minimum–maksimum değerler olarak sunuldu. Kategorik değişkenler ki-kare testi ile karşılaştırıldı. Normal dağılım göstermeyen sürekli değişkenler, iki grup karşılaştırmalarında Mann–Whitney U testi, ikiden fazla grup karşılaştırmalarında ise Kruskal–Wallis testi ile analiz edildi. p<0,05 değeri istatistiksel olarak anlamlı kabul edildi. Anlamlı sonuçlar için post-hoc ikili karşılaştırmalar Duncan testi ile yapıldı. Tedavi yöntemlerinin sigara bırakma sonuçları üzerindeki etkisini değerlendirmek için ikili (binary) lojistik regresyon analizi yapıldı ve Bonferroni düzeltmesi uygulandı (düzeltilmiş anlamlılık düzeyi: p<0,003).</p>
 
 <h2>Bulgular</h2>
-<p>Analize toplam 399 hasta dahil edildi. Katılımcıların yaş ortalaması 44,69 ± 12,05 yıl, ortanca yaş 44 (aralık: 18–74) idi. Çalışma popülasyonunun sosyodemografik özellikleri Tablo 1'de sunulmuştur. Sosyodemografik özellikler ile sigara bırakma durumu arasındaki karşılaştırmalar Tablo 2'de gösterilmiştir. Hanede başka bir sigara içicisinin varlığı, başarılı bırakma olasılığının anlamlı derecede daha düşük olmasıyla ilişkiliydi (p = 0,003). Benzer şekilde, sigaraya bağlı yakınma bildiren katılımcıların bırakma oranları daha düşüktü (p = 0,026).</p>
+<p>Analize toplam 399 hasta dahil edildi. Katılımcıların yaş ortalaması 44,69 ± 12,05 yıl, ortanca yaş 44 (aralık: 18–74) idi. Çalışma popülasyonunun sosyodemografik özellikleri Tablo 1'de sunulmuştur. Sosyodemografik özellikler ile sigara bırakma durumu arasındaki karşılaştırmalar Tablo 2'de gösterilmiştir. Hanede sigara içen başka birinin bulunması, başarılı bırakma olasılığının anlamlı derecede daha düşük olmasıyla ilişkiliydi (p = 0,003). Benzer şekilde, sigaraya bağlı yakınma bildiren katılımcıların bırakma oranları daha düşüktü (p = 0,026).</p>
 """
 
 RESULTS2 = f"""
 <p>Fagerström Nikotin Bağımlılık Testi (FNBT) puanlarına göre katılımcıların %13,19'u (n = 57) düşük, %61,34'ü (n = 265) orta ve %25,46'sı (n = 110) yüksek nikotin bağımlılığına sahipti. Katılımcıların çoğunluğu (%75,69, n = 327) daha önce sigarayı bırakmayı denemiş olup bunların %49,85'i (n = 163) bu denemeler sırasında profesyonel destek almıştı. Hastaların toplam %7,19'u (n = 31) sigara dışında tütün ürünleri kullandığını bildirdi; bunlar arasında elektronik sigara (%3,70, n = 16), nargile (%3,94, n = 17), puro (%1,39, n = 6) ve diğer tütün ürünleri yer alıyordu.</p>
-<p>Sigara bırakma polikliniğinde uygulanan tedavi yöntemlerinin dağılımı Tablo 3'te sunulmuştur. Hasta başına yüz yüze görüşme sayısı 1 ile 8 arasında değişiyordu. Sigarayı bırakamayan hastalar, başarıyla bırakanlara kıyasla anlamlı derecede daha az seansa katılmıştı (p < 0,001) ve anlamlı derecede daha yüksek FNBT puanlarına sahipti (p = 0,024). Sigara içme özellikleri, tedavi yaklaşımları ve bırakma sonuçları arasındaki ayrıntılı karşılaştırmalar Tablo 4'te sunulmuştur.</p>
-<p>Kombinasyon tedavisi en yüksek bırakma oranlarıyla ilişkili olup diğer tüm tedavi seçeneklerinden anlamlı derecede üstündü (p < 0,001). Tedavi türleri ile sigara bırakma sonuçlarının karşılaştırması, bupropion monoterapisi referans kategori olarak alınarak Tablo 5'te sunulmuştur. Farmakolojik tedavi almayan hastalarda bırakma olasılığı bupropion ile tedavi edilenlere göre 2,76 kat daha yüksek olmasına rağmen bu fark istatistiksel olarak anlamlı değildi (p = 0,075). Lojistik regresyon analizi, hanede başka bir sigara içicisinin varlığının bırakma olasılığını anlamlı derecede azalttığını (p = 0,003), hanede sigara içilmemesinin ise bırakma olasılığını neredeyse iki katına çıkardığını (Exp(B) = 1,953) ortaya koydu. FNBT puanı, bırakma başarısının anlamlı bir negatif öngörücüsüydü (B = −0,022, p = 0,023); bu, daha yüksek nikotin bağımlılığının daha düşük bırakma oranlarıyla ilişkili olduğunu göstermektedir. Sigaraya bağlı yakınmanın olmaması bırakma başarısıyla pozitif ilişkiliydi (B = 0,489, p = 0,026) ve yakınma bildirenlere kıyasla 1,63 kat daha yüksek bırakma olasılığına karşılık geliyordu. İleri analizler Tablo 6'da sunulmuştur.</p>
+<p>Sigara bırakma polikliniğinde uygulanan tedavi yöntemlerinin dağılımı Tablo 3'te sunulmuştur. Hasta başına yüz yüze görüşme sayısı 1 ile 8 arasında değişiyordu. Sigarayı bırakamayan hastalar, başarıyla bırakanlara kıyasla anlamlı derecede daha az seansa katılmıştı (p < 0,001) ve anlamlı derecede daha yüksek FNBT puanlarına sahipti (p = 0,024). Sigara içme özellikleri, tedavi yaklaşımları ve bırakma sonuçlarına ilişkin ayrıntılı karşılaştırmalar Tablo 4'te sunulmuştur.</p>
+<p>Kombine tedavi en yüksek bırakma oranlarıyla ilişkili olup diğer tüm tedavi seçeneklerinden anlamlı derecede üstündü (p < 0,001). Tedavi türleri ile sigara bırakma sonuçlarının karşılaştırması, bupropion monoterapisi referans kategori olarak alınarak Tablo 5'te sunulmuştur. Farmakolojik tedavi almayan hastalarda bırakma olasılığı bupropion ile tedavi edilenlere göre 2,76 kat daha yüksek olmasına rağmen bu fark istatistiksel olarak anlamlı değildi (p = 0,075). Lojistik regresyon analizi, hanede sigara içen başka birinin bulunmasının bırakma olasılığını anlamlı derecede azalttığını (p = 0,003), hanede sigara içen kimsenin olmamasının ise bırakma olasılığını neredeyse iki katına çıkardığını (Exp(B) = 1,953) ortaya koydu. FNBT puanı, bırakma başarısının anlamlı bir negatif öngörücüsüydü (B = −0,022, p = 0,023); bu, daha yüksek nikotin bağımlılığının daha düşük bırakma oranlarıyla ilişkili olduğunu göstermektedir. Sigaraya bağlı yakınmanın olmaması bırakma başarısıyla pozitif ilişkiliydi (B = 0,489, p = 0,026) ve yakınma bildirenlere kıyasla 1,63 kat daha yüksek bırakma olasılığına karşılık geliyordu. İleri analizler Tablo 6'da sunulmuştur.</p>
 """
 
 DISCUSSION = f"""
 <h2>Tartışma</h2>
-<p>Bu çalışmada, bir sigara bırakma polikliniğine başvuran bireylerin özelliklerini analiz ettik ve bırakma başarısını etkileyen faktörleri araştırdık. Bulgularımız; vareniklin, sitizin, nikotin replasman tedavisi (NRT) ve kombinasyon tedavilerinin, en az etkili seçenek olan bupropion monoterapisine kıyasla bırakma oranlarını anlamlı derecede artırdığını göstermektedir. Daha düşük FNBT puanları ve hanede sigara içen bulunmaması, daha yüksek bırakma başarısıyla ilişkiliydi.</p>
+<p>Bu çalışmada, bir sigara bırakma polikliniğine başvuran bireylerin özelliklerini analiz ettik ve bırakma başarısını etkileyen faktörleri araştırdık. Bulgularımız; vareniklin, sitizin, nikotin replasman tedavisi (NRT) ve kombine tedavilerin, en az etkili seçenek olan bupropion monoterapisine kıyasla bırakma oranlarını anlamlı derecede artırdığını göstermektedir. Daha düşük FNBT puanları ve hanede sigara içen kimsenin olmaması, daha yüksek bırakma başarısıyla ilişkiliydi.</p>
 <p>Özellikle vareniklin monoterapisinin sigara bırakma olasılığını bupropiona kıyasla yaklaşık dört kat artırdığı bulundu (p = 0,010). Bu bulgu, literatürde vareniklinin bupropion ve tek ajanlı NRT'ye üstün etkinliğini gösteren büyük ölçekli meta-analizler ve randomize kontrollü çalışmalar (RKÇ) ile uyumludur.{r(15)} Vareniklinin α4β2 nikotinik asetilkolin reseptöründeki parsiyel agonist aktivitesinin nikotin isteğini (craving) ve yoksunluk belirtilerini azaltırken aynı zamanda nikotinin ödüllendirici etkilerini zayıflattığı ve böylece bırakma oranlarını artırdığı düşünülmektedir.{r(16)}</p>
-<p>Benzer şekilde sitizin ve NRT monoterapisi, bupropiona kıyasla bırakma olasılığını yaklaşık üç kat artırdı. Vareniklinle benzer etki mekanizmasına sahip, maliyet-etkin bir parsiyel agonist olan sitizin Doğu ve Orta Avrupa'da yaygın olarak kullanılmaktadır. Klinik çalışmalardan elde edilen kanıtlar sitizinin plaseboya üstünlüğünü ve NRT ile karşılaştırılabilir etkinliğini doğrulamıştır.{r(17)} Bulgularımız sitizini bupropiona uygun bir alternatif olarak desteklemektedir. En yüksek bırakma oranları kombinasyon tedavisi alan hastalarda gözlendi; bu hastaların bırakma olasılığı bupropion grubuna göre yaklaşık dört kat daha yüksekti. Bu bulgu, monoterapi başarısız olduğunda veya bağımlılık şiddetli olduğunda uzun etkili NRT (bant) ile kısa etkili NRT (sakız veya pastil) ya da vareniklin ile bupropion kombinasyonu gibi kombinasyon rejimlerini öneren güncel klinik kılavuzları desteklemektedir.{r('18-20')} Kombinasyon yaklaşımları birbirini tamamlayan mekanizmalar aracılığıyla etki eder, daha stabil nikotin düzeyleri sağlar ve akut istek ataklarının daha etkili yönetilmesine yardımcı olur. Sonuçlarımız; vareniklin alan hastaların bupropion alanlara göre 1. ve 2. haftalarda ve 1., 3. ve 6. aylarda daha yüksek bırakma oranlarına sahip olduğunu, ancak 12. ayda anlamlı fark gözlenmediğini bildiren Benli ve ark. ile uyumludur.{r(21)} Yakın tarihli büyük ölçekli Avustralya çalışmaları sitizin ile vareniklini karşılaştırmış ve sitizinin benzer etkinlik gösterirken daha düşük yan etki insidansı ve daha düşük maliyet sunduğunu bildirmiştir; bu durum sitizini kaynakları kısıtlı ortamlarda uygun bir seçenek haline getirmektedir.{r(22)} Rigotti ve arkadaşları, 810 katılımcılı randomize klinik çalışmalarında sitizinin plaseboya kıyasla anlamlı derecede daha yüksek bırakma oranları sağladığını göstermiştir.{r(23)}</p>
-<p>Bir diğer önemli bulgu davranışsal desteğin etkisidir. Yüz yüze danışmanlık seanslarının sayısının bırakma başarısıyla anlamlı derecede ilişkili olduğu, daha fazla seansa katılan hastaların daha yüksek bırakma oranlarına ulaştığı bulundu (p < 0,001). Bu gözlem, daha sık takip vizitlerinin sonuçları iyileştirdiğini gösteren önceki çalışmalarla uyumludur.{r(24,25)} Kohortumuzda hasta başına ortalama danışmanlık seansı sayısı 2,21 ± 1,28 idi; bu bulgu, yoğun davranışsal desteğin sürdürülebilir bırakma için kritik önem taşıdığı görüşünü desteklemektedir.</p>
-<p>Özellikle dikkat çekici bir gözlem, hanede başka bir sigara içicisinin varlığının bırakma başarısını anlamlı derecede azaltması, hanede sigara içen bulunmamasının ise bırakma olasılığını neredeyse iki katına çıkarmasıydı. Bu bulgu, bırakma sürecinde sosyal ve çevresel faktörlerin önemini vurgulamaktadır. Literatür, eşin veya hane üyelerinin sigara içmesinin hem bir tetikleyici hem de motivasyon önünde bir engel işlevi gördüğünü ve böylece bırakma başarı oranlarını düşürdüğünü göstermektedir.{r(26)}</p>
+<p>Benzer şekilde sitizin ve NRT monoterapisi, bupropiona kıyasla bırakma olasılığını yaklaşık üç kat artırdı. Vareniklinle benzer etki mekanizmasına sahip, maliyet-etkin bir parsiyel agonist olan sitizin Doğu ve Orta Avrupa'da yaygın olarak kullanılmaktadır. Klinik çalışmalardan elde edilen kanıtlar sitizinin plaseboya üstünlüğünü ve NRT ile karşılaştırılabilir etkinliğini doğrulamıştır.{r(17)} Bulgularımız sitizini bupropiona uygun bir alternatif olarak desteklemektedir. En yüksek bırakma oranları kombine tedavi alan hastalarda gözlendi; bu hastalarda bırakma olasılığı bupropion grubuna göre yaklaşık dört kat daha yüksekti. Bu bulgu, monoterapi başarısız olduğunda veya bağımlılık şiddetli olduğunda uzun etkili NRT (bant) ile kısa etkili NRT (sakız veya pastil) ya da vareniklin ile bupropion kombinasyonu gibi kombine rejimleri öneren güncel klinik kılavuzları desteklemektedir.{r('18-20')} Kombine yaklaşımlar birbirini tamamlayan mekanizmalar aracılığıyla etki eder, daha stabil nikotin düzeyleri sağlar ve akut nikotin isteğinin daha etkili yönetilmesine yardımcı olur. Sonuçlarımız; vareniklin alan hastaların bupropion alanlara göre 1. ve 2. haftalarda ve 1., 3. ve 6. aylarda daha yüksek bırakma oranlarına sahip olduğunu, ancak 12. ayda anlamlı fark gözlenmediğini bildiren Benli ve ark. ile uyumludur.{r(21)} Yakın tarihli büyük ölçekli Avustralya çalışmaları sitizin ile vareniklini karşılaştırmış ve sitizinin benzer etkinlik gösterirken daha düşük yan etki insidansı ve daha düşük maliyet sunduğunu bildirmiştir; bu durum sitizini kaynakları kısıtlı ortamlarda uygun bir seçenek haline getirmektedir.{r(22)} Rigotti ve arkadaşları, 810 katılımcılı randomize klinik çalışmalarında sitizinin plaseboya kıyasla anlamlı derecede daha yüksek bırakma oranları sağladığını göstermiştir.{r(23)}</p>
+<p>Bir diğer önemli bulgu, davranışsal desteğin etkisidir. Yüz yüze danışmanlık seanslarının sayısının bırakma başarısıyla anlamlı derecede ilişkili olduğu, daha fazla seansa katılan hastaların daha yüksek bırakma oranlarına ulaştığı bulundu (p < 0,001). Bu gözlem, daha sık takip vizitlerinin sonuçları iyileştirdiğini gösteren önceki çalışmalarla uyumludur.{r(24,25)} Kohortumuzda hasta başına ortalama danışmanlık seansı sayısı 2,21 ± 1,28 idi; bu bulgu, yoğun davranışsal desteğin sürdürülebilir bırakma için kritik önem taşıdığı görüşünü desteklemektedir.</p>
+<p>Özellikle dikkat çekici bir gözlem, hanede sigara içen başka birinin bulunmasının bırakma başarısını anlamlı derecede azaltması, hanede sigara içen kimsenin olmamasının ise bırakma olasılığını neredeyse iki katına çıkarmasıydı. Bu bulgu, bırakma sürecinde sosyal ve çevresel faktörlerin önemini vurgulamaktadır. Literatür, eşin veya hane üyelerinin sigara içmesinin hem bir tetikleyici hem de motivasyon önünde bir engel işlevi gördüğünü ve böylece bırakma başarı oranlarını düşürdüğünü göstermektedir.{r(26)}</p>
 <p>FNBT ile ölçülen nikotin bağımlılığının şiddeti de bırakma sonuçlarının anlamlı bir öngörücüsüydü; bu, tedavi arayan sigara içicilerinde ortalama puanın yaklaşık 5 olduğunu bildiren önceki çalışmalarla uyumludur.{r(27)} Kohortumuzda ortalama FNBT puanı 5,66 ± 2,43 idi ve daha yüksek puanlar bırakma başarısıyla negatif ilişkiliydi; bu durum, yüksek bağımlılığı olan bireyler için daha yoğun farmakolojik ve davranışsal müdahalelere olan ihtiyacı ortaya koymaktadır.{r('28-30')}</p>
 <p>İlginç bir şekilde, sigaraya bağlı yakınması olmayan katılımcıların, semptomu olanlara kıyasla 1,63 kat daha yüksek bırakma olasılığına sahip olduğu bulundu. Sağlık kaygılarının sıklıkla bırakmanın birincil motivasyon kaynağı olarak gösterildiği düşünüldüğünde bu durum sezgiye aykırı görünebilir; olası bir açıklama, asemptomatik bireylerin anlık tepkisel korkudan ziyade uzun vadeli sağlığı koruma amacıyla daha proaktif ve içsel bir bırakma motivasyonuna sahip olabileceğidir. Otonom motivasyonun, dışsal motivasyonla yapılan girişimlere kıyasla daha sürdürülebilir davranış değişikliğiyle sonuçlandığı gösterilmiştir.{r(31)} Bir diğer olası açıklama ise kronik hastalığı veya semptomları olan bireylerin sigarayı bir başa çıkma mekanizması olarak kullanabilmesi ve bunun bırakmayı zorlaştırabilmesidir.</p>
 <p>Son olarak, çalışmamız sonuçları ilaçların ücretsiz sağlanıp sağlanmadığına göre ayrıntılı olarak incelememiş olsa da önceki araştırmalar, farmakoterapinin ücretsiz sağlanmasının tedaviye uyumu ve sigara bırakma başarısını artırdığını göstermiştir.{r(32)} Analizimizde maliyetle ilgili verilerin bulunmaması olası bir karıştırıcı faktör oluşturabilir.</p>
@@ -211,7 +211,7 @@ DISCUSSION = f"""
 <p>Bu çalışma, bildiğimiz kadarıyla sitizin ile sigara bırakma tedavisini ele alan erişilebilir ilk tez çalışması olması bakımından dikkate değer bir güçlü yön sunmaktadır. Ayrıca bupropion, vareniklin, sitizin ve Nikotin Replasman Tedavisi (NRT) dahil çeşitli tedavi yöntemlerinden elde edilen sonuçları kapsayan geniş yapısı, bu çalışmayı alana değerli bir katkı haline getirmektedir.</p>
 
 <h2>Sonuç ve Öneriler</h2>
-<p>Kombinasyon tedavisi alan hastalarda sigara bırakma oranları, monoterapi veya diğer tedavi seçeneklerini kullananlara göre daha yüksek bulundu. Artan tedavi uyumu ile daha yüksek bırakma oranları arasında pozitif bir korelasyon gözlendi. Bu bağlamda, tedavi seansları sırasında hastaların sigara bırakma motivasyonunu artırmaya yönelik çabaların yoğunlaştırılması önerilmektedir.</p>
+<p>Kombine tedavi alan hastalarda sigara bırakma oranları, monoterapi veya diğer tedavi seçeneklerini kullananlara göre daha yüksek bulundu. Artan tedavi uyumu ile daha yüksek bırakma oranları arasında pozitif bir korelasyon gözlendi. Bu bağlamda, tedavi seansları sırasında hastaların sigara bırakma motivasyonunu artırmaya yönelik çabaların yoğunlaştırılması önerilmektedir.</p>
 
 <h3>Etik onay</h3>
 <p>Çalışma protokolü Samsun Üniversitesi Tıp Fakültesi Etik Kurulu tarafından onaylanmıştır (Onay No: 2023/18/10, 4 Ekim 2023 tarihli). Tüm hastalardan ilk vizitlerinde yazılı bilgilendirilmiş onam alınmıştır.</p>
@@ -266,7 +266,7 @@ CSS = """
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body { font-family: "Liberation Serif", "DejaVu Serif", serif; font-size: 10pt; line-height: 1.38; color: #111; }
-p { margin: 0 0 7pt 0; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+p { margin: 0 0 7pt 0; text-align: justify; hyphens: manual; }
 sup.ref { font-size: 7pt; line-height: 0; vertical-align: super; }
 .sans { font-family: "Liberation Sans", "DejaVu Sans", sans-serif; }
 
@@ -312,12 +312,50 @@ ol.refs li { margin-bottom: 4pt; padding-left: 2pt; text-align: justify; }
 .brk { break-before: page; }
 """
 
+
+
+import re as _re
+_V = set("aeıioöuüâîûAEIİOÖUÜÂÎÛ")
+def _syllables(w):
+    # Türkçe hece kuralları: her hecede tek ünlü; V-CV, VC-CV, VCC-CV
+    idx=[i for i,ch in enumerate(w) if ch in _V]
+    if len(idx)<2: return [w]
+    cuts=[]
+    for a,b in zip(idx,idx[1:]):
+        k=b-a-1  # aradaki ünsüz sayısı
+        if k==0: cuts.append(b)
+        elif k==1: cuts.append(b-1)
+        elif k==2: cuts.append(b-1)
+        else: cuts.append(b-1)  # kont-rol, Türk-çe
+    parts=[]; p=0
+    for c in cuts: parts.append(w[p:c]); p=c
+    parts.append(w[p:])
+    return parts
+def _hyph_word(m):
+    w=m.group(0)
+    if len(w)<7: return w
+    parts=_syllables(w)
+    if len(parts)<2: return w
+    out=parts[0]
+    for pt in parts[1:]:
+        # baştan/sondan en az 3 harf kalsın
+        if len(out)>=3 and len(w)-len(out)>=3: out+="­"+pt
+        else: out+=pt
+    return out
+_WORD=_re.compile(r"[A-Za-zÇĞİÖŞÜçğıöşüÂÎÛâîû]+")
+def hyphenate(html_text):
+    # etiketlerin dışındaki metni hecele
+    pieces=_re.split(r"(<[^>]+>)", html_text)
+    return "".join(p if p.startswith("<") else _WORD.sub(_hyph_word,p) for p in pieces)
+
+ABSTRACT=hyphenate(ABSTRACT); INTRO=hyphenate(INTRO); RESULTS2=hyphenate(RESULTS2); DISCUSSION=hyphenate(DISCUSSION)
+
 HEAD = f"""<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>Sigara Bırakma Polikliniği Hastaları – Türkçe Çeviri</title><style>{CSS}</style></head><body>
 <div class="top">
   <div class="cite">DOI: 10.54308/TJFP.2026.912</div>
   <div class="badge">Araştırma Makalesi</div>
 </div>
-<h1>Bir üniversite hastanesine bağlı sigara bırakma polikliniğine başvuran hastaların demografik ve klinik özellikleri ve sigara bırakma durumlarını etkileyen faktörler</h1>
+<h1>Bir üniversite hastanesine bağlı sigara bırakma polikliniğine başvuran hastaların demografik ve klinik özellikleri ile sigara bırakma durumlarını etkileyen faktörler</h1>
 <div class="authors">Emre Cenberlitaş<sup>1</sup>, Aksanur Gökçe<sup>2</sup>, Onur Öztürk<sup>3</sup></div>
 <div class="affil">
 <sup>1</sup>İstanbul Beylikdüzü Kavaklı 3 No'lu Aile Sağlığı Merkezi (Birim: 34.12.035), İstanbul, Türkiye<br>
