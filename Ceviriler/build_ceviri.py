@@ -44,8 +44,8 @@ T3_comb = [
 
 T4 = [
     ("Görüşme sayısı", [("Başarısız", "1,96±1,17", "2 (1–6)"), ("Başarılı", "2,83±1,33", "3 (1–8)")], "<0,001"),
-    ("FNBT puanı", [("Başarısız", "5,85±2,40", "6 (0–10)"), ("Başarılı", "5,26±2,52", "5 (0–10)")], "0,024"),
-    ("Sigara tüketimi (paket-yıl)", [("Başarısız", "28,12±17,43", "26,5 (1,5–100)"), ("Başarılı", "26,66±15,25", "24 (1–72)")], "0,550"),
+    ("FNBT puanı", [("Başarısız", "5,85±2,40", "6 (0–10)"), ("Başarılı", "5,26±2,52", "5 (0–10)")], "24"),
+    ("Sigara tüketimi (paket-yıl)", [("Başarısız", "28,12±17,43", "26,5 (1,5–100)"), ("Başarılı", "26,66±15,25", "24 (1–72)")], "550"),
 ]
 
 T5 = [
@@ -56,17 +56,17 @@ T5 = [
 
 T6 = [
     ("Tedavi yöntemi (Referans: Bupropion monoterapisi)", [
-        ("Vareniklin monoterapisi", "1,397", "0,540", "6,697", "0,010", "4,044"),
-        ("Sitizin monoterapisi", "1,014", "0,442", "5,267", "0,022", "2,758"),
-        ("NRT monoterapisi", "1,110", "0,346", "10,272", "0,001", "3,033"),
-        ("Kombine tedavi", "1,378", "0,309", "19,924", "<0,001", "3,968"),
-        ("Farmakolojik tedavi yok", "1,014", "0,569", "3,174", "0,075", "2,758"),
+        ("Vareniklin monoterapisi", "1,397", "540", "6,697", "0,010", "4,044"),
+        ("Sitizin monoterapisi", "1,014", "442", "5,267", "0,022", "2,758"),
+        ("NRT monoterapisi", "1,110", "346", "10,272", "0,001", "3,033"),
+        ("Kombine tedavi", "1,378", "309", "19,924", "<0,001", "3,968"),
+        ("Farmakolojik tedavi yok", "1,014", "569", "3,174", "0,075", "2,758"),
     ]),
     ("Hanede başka sigara içen (Referans: Evet)", [
-        ("Hanede başka sigara içen yok", "0,669", "0,225", "8,823", "0,003", "1,953"),
+        ("Hanede başka sigara içen yok", "669", "225", "8,823", "0,003", "1,953"),
     ]),
     ("Sigaraya bağlı yakınma (Referans: Var)", [
-        ("Sigaraya bağlı yakınma yok", "0,489", "0,220", "4,932", "0,026", "1,630"),
+        ("Sigaraya bağlı yakınma yok", "489", "220", "4,932", "0,026", "1,630"),
     ]),
 ]
 
