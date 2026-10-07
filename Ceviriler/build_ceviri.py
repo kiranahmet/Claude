@@ -368,15 +368,22 @@ HEAD = f"""<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><title>Sig
   <div><b>Geliş:</b> 29.09.2025 &nbsp;&nbsp; <b>Kabul:</b> 11.03.2026 &nbsp;&nbsp; <b>Yayın:</b> 30.06.2026</div>
 </div>
 <div class="copy">Telif Hakkı © 2026 Yazar(lar). Türkiye Aile Hekimleri Uzmanlık Derneği (Turkish Association of Family Physicians) tarafından yayımlanmıştır. Bu makale, uygun atıf yapılması koşuluyla her ortam ve formatta sınırsız kullanım, dağıtım ve çoğaltmaya izin veren <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Atıf Lisansı (CC BY)</a> kapsamında yayımlanan açık erişimli bir makaledir.</div>
-<div class="note"><b>Çeviri notu:</b> Bu belge, yukarıda künyesi verilen İngilizce makalenin Türkçe çevirisidir; orijinal makale yerine geçmez ve atıflarda özgün yayın esas alınmalıdır. Özgün kaynak: Cenberlitaş E, Gökçe A, Öztürk O. Demographic and clinical characteristics of patients applying to a smoking cessation clinic affiliated with a university hospital and factors affecting their smoking cessation status. Turk J Fam Pract 2026;30(2):97-106. DOI: 10.54308/TJFP.2026.912. Gövde metninde ondalık ayırıcı olarak Türkçe yazım kuralına uygun biçimde virgül, tablolarda ise orijinal yayındaki gibi nokta kullanılmıştır.</div>
+<div class="note"><b>Çeviri notu:</b> Bu belge, yukarıda künyesi verilen İngilizce makalenin Türkçe çevirisidir; orijinal makale yerine geçmez ve atıflarda özgün yayın esas alınmalıdır. Özgün kaynak: Cenberlitaş E, Gökçe A, Öztürk O. Demographic and clinical characteristics of patients applying to a smoking cessation clinic affiliated with a university hospital and factors affecting their smoking cessation status. Turk J Fam Pract 2026;30(2):97-106. DOI: 10.54308/TJFP.2026.912. Gövde metninde ondalık ayırıcı olarak Türkçe yazım kuralına uygun biçimde virgül, tablolarda ise orijinal yayındaki yazım korunmuştur.</div>
 """
 
 def dotdec(h):
     # tablolarda ondalık ayırıcı: orijinal yayındaki gibi nokta
     return _re.sub(r"(\d),(\d)", r"\1.\2", h)
 
+def table6_orig():
+    # Tablo 6: orijinalde p değeri sütunu virgüllü (<0.001 hariç), diğer sütunlar noktalı
+    h=dotdec(table6())
+    for v in ["010","022","001","075","003","026"]:
+        h=h.replace("<td class='c'>0."+v+"</td>","<td class='c'>0,"+v+"</td>")
+    return h
+
 BODY = f"""
-<div class="cols brk">{INTRO}{dotdec(table1())}{dotdec(table2())}{RESULTS2}{dotdec(table3())}{dotdec(table4())}{dotdec(table5())}{dotdec(table6())}{DISCUSSION}{refs_html}</div>
+<div class="cols brk">{INTRO}{dotdec(table1())}{dotdec(table2())}{RESULTS2}{dotdec(table3())}{dotdec(table4())}{dotdec(table5())}{table6_orig()}{DISCUSSION}{refs_html}</div>
 </body></html>"""
 
 with open(OUT, "w", encoding="utf-8") as f:
