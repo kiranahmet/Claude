@@ -42,11 +42,10 @@ govde.push(new Paragraph({ spacing: { after: 240 }, children: [new TextRun({ tex
 govde.push(p("Sunulan makale: Cenberlitaş E, Gökçe A, Öztürk O. Demographic and clinical characteristics of patients applying to a smoking cessation clinic affiliated with a university hospital and factors affecting their smoking cessation status. Turk J Fam Pract. 2026;30(2):97-106. doi:10.54308/TJFP.2026.912", { run: { size: 20, color: GRI } }));
 
 govde.push(baslik("Genel bilgiler"));
-govde.push(madde("Sunum 28 slayttan oluşmaktadır. Konuşma süresi yaklaşık 32 dakikadır; ardından 10 dakikalık tartışma planlanmıştır."));
+govde.push(madde(`Sunum ${Object.keys(NOTLAR).length} slayttan oluşmaktadır. Konuşma süresi yaklaşık ${Math.round(toplam)} dakikadır; ardından kısa bir tartışma planlanmıştır.`));
 govde.push(madde("Slayt başına ortalama 1 dakika hedeflenmiştir. Olgu slaytına (25) yaklaşık 3 dakika ayrılmıştır."));
 govde.push(madde("Notlar okunmak için değil, hatırlatıcı olarak hazırlanmıştır. Slaytı okumak yerine anlatmaya, dinleyicilerle göz teması kurmaya ve dinleyicilere arkanızı dönmemeye özen gösterin."));
 govde.push(madde("Köşeli parantez içindeki [Ad Soyad], [kaçıncı yıl] ve [e-posta adresi] alanlarını sunumdan önce doldurun. Bu alanlar 1. ve 28. slaytta da yer almaktadır."));
-govde.push(madde("Makalenin üçüncü yazarı Prof. Dr. Onur Öztürk, Amasya Üniversitesi Aile Hekimliği Ana Bilim Dalı'ndandır. Hoca dinleyiciler arasında olabilir. Eleştirel değerlendirme slaytlarındaki (22–23) noktaları yapıcı ve soru biçiminde dile getirmeniz önerilir."));
 govde.push(madde("Sunumdan önce dosyayı en az iki farklı ortama (USB bellek ve e-posta gibi) kaydedin ve sunum yapılacak bilgisayarda deneme yapın."));
 
 govde.push(baslik("Süre planı"));
