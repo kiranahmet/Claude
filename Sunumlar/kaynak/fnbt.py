@@ -23,14 +23,11 @@ madde("**Ne ölçer:** Nikotine fiziksel bağımlılığın düzeyini. Hasta tar
 
 # 2
 par("2. Testin soruları ve puanlaması (Hoca, Slayt 51)", style="Heading 1")
-tablo(["Soru", "Cevap", "Puan"], [
-    ["1. Her gün genellikle kaç sigara içiyorsunuz?", "0–10\n11–20\n21–30\n30'dan fazla", "0\n1\n2\n3"],
-    ["2. İlk sigaranızı uyandıktan ne kadar sonra içiyorsunuz?", "0–5 dk\n6–30 dk\n31–60 dk\n60 dk'dan sonra", "3\n2\n1\n0"],
-    ["3. Sigara içilmeyen yerlerde sigara içmemekte zorlanıyor musunuz?", "Hayır\nEvet", "0\n1"],
-    ["4. Hangi sigaradan vazgeçmekte en çok zorlanırsınız?", "Sabah ilk içilen\nDiğer", "1\n0"],
-    ["5. Günün ilk saatlerinde sonraki saatlere göre daha sık sigara içiyor musunuz?", "Hayır\nEvet", "0\n1"],
-    ["6. Çok hasta olduğunuzda veya günün çoğunu yatakta geçirdiğinizde sigara içer misiniz?", "Hayır\nEvet", "0\n1"],
-], [9.0, 4.5, 2.0])
+gorsel = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fnbt_slayt51.png")
+p = par(after=2)
+p.alignment = 1
+p.add_run().add_picture(gorsel, width=Cm(15.5))
+par("Görsel: Hocanın ders slaytı, Slayt 51 (orijinal tablo)", italic=True, color=GRI, size=9, after=8).alignment = 1
 etiket("Puanlamada dikkat edilecekler")
 madde("İki soru 0–3 puan alır: **günlük sigara sayısı** ve **uyandıktan sonra ilk sigara zamanı**. Diğer dört soru 0–1 puan alır. En yüksek toplam: 3 + 3 + 1 + 1 + 1 + 1 = 10.")
 madde("İlk sigara sorusunda puan **ters** işler: ne kadar erken içilirse puan o kadar yüksektir (0–5 dk = 3 puan).")
