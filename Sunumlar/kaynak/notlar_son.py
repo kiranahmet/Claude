@@ -8,10 +8,10 @@ GRI = RGBColor(0x5F, 0x71, 0x78)
 
 S = [  # (başlık, saniye, [paragraflar])
  ("Başlık", 45, [
-  "Değerli hocalarım, değerli arkadaşlarım. Ben Asistan Dr. Ahmet Kıran.",
+  "Değerli hocalarım, asistan arkadaşlarım. Ben Asistan Dr. Ahmet Kıran.",
   "Bugün sizlere Uzm. Dr. Emre Cenberlitaş ve hocalarımızdan Aksanur ve Onur hocamızın “Bir üniversite hastanesine bağlı sigara bırakma polikliniğine başvuran hastaların demografik ve klinik özellikleri ile sigara bırakma durumlarını etkileyen faktörler” başlıklı makalesini sunacağım."]),
  ("Makalenin ilk sayfası (künye sözlü)", 45, [
-  "Makalenin ilk sayfasını görüyorsunuz. Makale, Türkiye Aile Hekimleri Uzmanlık Derneği'nin yayın organı olan Turkish Journal of Family Practice'in 2026 yılı 30. cilt 2. sayısında, 97–106. sayfalar arasında yayımlanmıştır.",
+  "Makalenin ilk sayfasını görüyorsunuz. Makale, Turkish Journal of Family Practice'in 2026 yılı 30. cilt 2. sayısında, 97–106. sayfalar arasında yayımlanmıştır.",
   "Çalışma retrospektif, kesitsel bir araştırmadır. Veriler Samsun Eğitim ve Araştırma Hastanesi Sigara Bırakma Polikliniği'nden elde edilmiştir."]),
  ("İçerik", 30, [
   "Sunum 26 slayttan oluşmakta ve yaklaşık yirmi dakika sürecektir.",
@@ -34,7 +34,7 @@ S = [  # (başlık, saniye, [paragraflar])
   "Tedavi FNBT (Fagerström Nikotin Bağımlılık Testi) puanı, kronik hastalıklar, kullanılan ilaçlar, kontrendikasyonlar ve hasta uyumuna göre bireyselleştirilmiştir.",
   "Hastalara yalnızca davranışsal tedavi, monoterapi ya da kombine tedavi uygulanmıştır. Kombine tedavi seçenekleri bupropion ile NRT, vareniklin ile NRT, sitizin ile NRT ve üçlü tedavidir. Sağlık Bakanlığı politikaları doğrultusunda NRT ve sitizin belirli dönemlerde ücretsiz sağlanmıştır."]),
  ("İstatistiksel analiz", 45, [
-  "Analizler SPSS 25 ile yapılmıştır. Normallik histogram ve Kolmogorov–Smirnov testiyle değerlendirilmiştir.",
+  "Bu slaytı geçelim. Analizler SPSS 25 ile yapılmıştır. Normallik histogram ve Kolmogorov–Smirnov testiyle değerlendirilmiştir.",
   "Kategorik değişkenler ki-kare testiyle, iki grup karşılaştırmaları Mann–Whitney U, ikiden fazla grup karşılaştırmaları Kruskal–Wallis testiyle yapılmıştır. Post-hoc karşılaştırmalarda Duncan testi kullanılmıştır.",
   "Tedavi yöntemlerinin bırakma üzerindeki etkisi ikili lojistik regresyonla değerlendirilmiş ve Bonferroni düzeltmesi uygulanmıştır."]),
  ("Katılımcıların genel özellikleri", 45, [
@@ -56,7 +56,7 @@ S = [  # (başlık, saniye, [paragraflar])
   "Tabloda uygulanan tedaviler görülmektedir. En sık uygulanan yöntem 141 hasta ile kombine tedavidir. Bunu 109 hasta ile bupropion ve 80 hasta ile NRT monoterapisi izlemektedir.",
   "Kombine tedavi alan hastaların 125'i bupropion ile NRT almıştır. Vareniklin 18, sitizin 34 hastada tek başına kullanılmış; 17 hastaya yalnızca non-farmakolojik (davranışsal) tedavi uygulanmıştır."]),
  ("Görüşme sayısı, FNBT ve paket-yıl (Tablo 4)", 45, [
-  "Bu tabloda sigara içme ve tedaviye ilişkin bazı parametreler sigara bırakma durumu ile karşılaştırılmıştır. Sigarayı bırakanlar ortalama 2,83 kez, bırakamayanlar 1,96 kez görüşmeye gelmiştir; fark anlamlıdır, p<0,001.",
+  "Burada da sigara içme ve tedaviye ilişkin bazı parametreler sigara bırakma durumu ile karşılaştırılmıştır. Sigarayı bırakanlar ortalama 2,83 kez, bırakamayanlar 1,96 kez görüşmeye gelmiştir; fark anlamlıdır, p<0,001.",
   "Bırakanların FNBT (Fagerström Nikotin Bağımlılık Testi) puanı daha düşüktür: 5,26'ya karşı 5,85; p değeri 0,024'tür.",
   "Paket-yıl açısından iki grup arasında anlamlı fark bulunmamıştır."]),
  ("Tedavi yöntemine göre bırakma (Tablo 5)", 60, [
