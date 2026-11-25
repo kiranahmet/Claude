@@ -10,17 +10,22 @@ Kurulum:
     pip install python-roborock      (Python 3.11 veya üstü gerekir)
     python kurulum.py
 
-Not: Şifren ya da kodun hiçbir yere kaydedilmez; yalnızca Roborock'un kendi
-sunucusuna gönderilir (Roborock uygulamasının yaptığı gibi).
+Not: E-posta kodun hiçbir yere kaydedilmez. Girişten sonra, bir sonraki
+çalıştırmada yeniden kod istememek için oturum bilgisi bu klasördeki
+"roborock_giris.json" dosyasına kaydedilir. Kurulum bitince bu dosyayı
+silebilirsin (silmen önerilir, Roborock hesabına erişim anahtarı içerir).
 """
 
 import asyncio
+import json
 import sys
+from pathlib import Path
 
 try:
     from roborock.devices.device_manager import UserParams, create_device_manager
     from roborock.devices.transport.local_channel import LocalChannel
     from roborock.protocols.v1_protocol import RequestMessage, decode_rpc_response
+    from roborock.data import UserData
     from roborock.roborock_message import RoborockMessageProtocol
     from roborock.web_api import RoborockApiClient
 except ImportError:
@@ -35,6 +40,8 @@ ODALAR = [
     ("Cocuk Odasi", 27, 18),
     ("Yatak Odasi", 14, 17),
 ]
+
+GIRIS_DOSYASI = Path(__file__).with_name("roborock_giris.json")
 
 _TR = str.maketrans("ıİçÇşŞğĞüÜöÖ", "iicCsSgGuUoO")
 
@@ -82,13 +89,8 @@ async def main():
         print(await yerel_komut(ip, key, duid, method))
         return
 
-    email = input("Roborock uygulamasındaki e-posta adresin: ").strip()
-    api = RoborockApiClient(email)
-    print("Doğrulama kodu e-postana gönderiliyor...")
-    await api.request_code()
-    kod = input("E-postana gelen kodu gir: ").strip()
-    user_data = await api.code_login(kod)
-    print("Giriş başarılı. Cihazlar aranıyor (10-20 sn sürebilir)...\n")
+    email, user_data = await giris_yap()
+    print("Cihazlar aranıyor (10-20 sn sürebilir)...\n")
 
     yonetici = await create_device_manager(UserParams(username=email, user_data=user_data))
     try:
@@ -97,9 +99,42 @@ async def main():
             print("Hesapta desteklenen süpürge bulunamadı.")
             return
         for cihaz in cihazlar:
-            await kur(cihaz)
+            try:
+                await kur(cihaz)
+            except Exception as e:  # noqa: BLE001
+                print(f"\nSORUN: {cihaz.name} ile bağlantı kurulamadı: {e}")
+                print("- Robot açık ve Wi-Fi'ye bağlı mı? Roborock uygulamasında görünüyor mu?")
+                print("- Bilgisayar internete bağlı mı? Sorun sürerse betiği tekrar çalıştır.")
+                print(f"- Giriş sorunu olduğunu düşünüyorsan '{GIRIS_DOSYASI.name}' dosyasını sil.")
     finally:
         await yonetici.close()
+
+
+async def giris_yap():
+    """Kayıtlı giriş varsa onu kullanır, yoksa e-posta koduyla giriş yapar."""
+    if GIRIS_DOSYASI.exists():
+        try:
+            kayit = json.loads(GIRIS_DOSYASI.read_text(encoding="utf-8"))
+            cevap = input(f"Kayıtlı giriş bulundu ({kayit['email']}). Kullanılsın mı? (E/h): ")
+            if not cevap.strip().lower().startswith("h"):
+                return kayit["email"], UserData.from_dict(kayit["user_data"])
+        except Exception:  # noqa: BLE001 - bozuk kayıt: yeniden giriş yap
+            pass
+
+    email = input("Roborock uygulamasındaki e-posta adresin: ").strip()
+    api = RoborockApiClient(email)
+    print("Doğrulama kodu e-postana gönderiliyor...")
+    await api.request_code()
+    kod = input("E-postana gelen kodu gir: ").strip()
+    user_data = await api.code_login(kod)
+    print("Giriş başarılı.")
+    try:
+        GIRIS_DOSYASI.write_text(json.dumps({"email": email, "user_data": user_data.as_dict()}),
+                                 encoding="utf-8")
+        print(f"(Bir dahaki sefere kod gerekmesin diye giriş '{GIRIS_DOSYASI.name}' dosyasına kaydedildi.)")
+    except OSError:
+        pass
+    return email, user_data
 
 
 async def kur(cihaz):
@@ -159,8 +194,19 @@ async def kur(cihaz):
             print(f"  Hata: {e}")
 
 
+def calistir(coro):
+    # Windows'ta Python'un varsayılan olay döngüsü (Proactor) Roborock'un bulut
+    # bağlantısının (MQTT) ihtiyaç duyduğu add_reader/add_writer'ı desteklemez.
+    # Bu yüzden Windows'ta Selector döngüsü kullanılır.
+    if sys.platform == "win32":
+        if sys.version_info >= (3, 12):
+            return asyncio.run(coro, loop_factory=asyncio.SelectorEventLoop)
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    return asyncio.run(coro)
+
+
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        calistir(main())
     except KeyboardInterrupt:
         pass

@@ -165,6 +165,10 @@ python kurulum/kurulum.py
 6. İstersen betik gerçek bir oda süpürme testi de yapar. Böylece kutuyu
    lehimlemeden önce oda numaralarının doğru olduğundan emin olursun.
 
+> Betiği tekrar çalıştırırsan yeniden e-posta kodu istemez. Girişi `kurulum` klasöründeki
+> `roborock_giris.json` dosyasına kaydeder. Kurulum bitince bu dosyayı **sil**, çünkü
+> Roborock hesabına erişim anahtarı içerir.
+
 > Oda adları Roborock uygulamasında verdiğin adlardır. Betik bunları otomatik
 > eşleştirir. Eşleşmeyen satırın yanına uyarı yazar, o numarayı listeden elle yaz.
 
@@ -222,6 +226,7 @@ başladığında robot yeni bir IP alabilir ve kumanda çalışmayı bırakır.
 | 6 hızlı yanıp sönme, Seri Monitör'de "Robota baglanilamadi" | `ROBOT_IP` doğru mu? Robot ile ESP32 aynı ağda mı? Misafir ağı ya da "AP izolasyonu" açıksa kapat. |
 | "yanit zaman asimi" | `LOCAL_KEY` yanlış olabilir. Robotu sıfırladıysan ya da uygulamaya yeniden eklediysen key değişir, `kurulum.py`'yi tekrar çalıştır. |
 | Yanlış oda süpürülüyor | Haritayı yeniden oluşturduysan oda numaraları değişir. `kurulum.py`'yi tekrar çalıştır. |
+| `kurulum.py` "NotImplementedError" ya da "MQTT ... timed out" hatası veriyor | Eski sürüm. Zip'teki güncel `kurulum.py`'yi kullan (Windows düzeltmesi var). |
 | Butona basınca tepki yok | Butonun bir ucu 3V3'e, diğeri doğru GPIO'ya mı bağlı? Seri Monitör'de "... secildi" yazısı çıkıyor mu? |
 
 ## Dosyalar
