@@ -233,6 +233,7 @@ SAYFA = """<!doctype html>
       <tr><td>Seçili LED'ler 2 kez yavaş</td><td>Tamam, robot yola çıktı</td></tr>
       <tr><td>Tüm LED'ler 6 kez hızlı</td><td>Hata (Wi-Fi ya da robot)</td></tr>
       <tr><td>Tüm LED'ler 2 kez kısa</td><td>Önce oda seç</td></tr>
+      <tr><td>Bir oda LED'i 3 kez hızlı</td><td>O oda bu robotta yok</td></tr>
       <tr><td>Kartın mavi LED'i yanıp sönüyor</td><td>Wi-Fi bağlantısı yok</td></tr>
     </table>
   </div>
@@ -243,7 +244,7 @@ SAYFA = """<!doctype html>
     <div>Robot IP: <span class="cizgi"></span></div>
     <div>Local key: <span class="cizgi"></span></div>
     <div>Wi-Fi adı: <span class="cizgi"></span></div>
-    <div>Kumanda IP: <span class="cizgi"></span></div>
+    <div>Robot adı: <span class="cizgi"></span></div>
     {segmentler}
   </div>
 </div>

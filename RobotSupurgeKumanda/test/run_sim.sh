@@ -67,4 +67,19 @@ senaryo "$A" 7 32@1500 13@5500
 grep -q "Zaman asimi" "$TMP/sim.log" && [ "$(rpc_sayisi)" = 0 ]
 sonuc "$A" $?
 
+# --- Segment 0: o oda bu robotta yok, butona basınca seçilmemeli
+mkdir -p "$TMP/cfg"
+sed 's/{"Yatak Odasi",     14,   17,  21}/{"Yatak Odasi",     14,   17,  0}/' \
+  ../RobotSupurgeKumanda/config.h >"$TMP/cfg/config.h"
+grep -q '14,   17,  0}' "$TMP/cfg/config.h" || { echo "FAIL test ayari olusturulamadi"; fail=1; }
+g++ -std=gnu++17 -Wall -Wextra -O1 -I"$TMP/cfg" -Isim -I../RobotSupurgeKumanda -o "$TMP/sim0" \
+  "$TMP/sketch.cpp" sim/sim_main.cpp ../RobotSupurgeKumanda/roborock_local.cpp -lmbedcrypto || exit 1
+A="Segment 0 olan oda secilmez, LED'i yanip soner; digerleri calisir"
+cp "$TMP/sim" "$TMP/sim_normal"; cp "$TMP/sim0" "$TMP/sim"
+senaryo "$A" 6 14@1500 32@2500 13@2900
+cp "$TMP/sim_normal" "$TMP/sim"
+grep -q "tanimli degil" "$TMP/sim.log" && grep -qF '"segments": [16]' "$TMP/robot.log" \
+  && [ "$(grep -c 'LED 17=1' "$TMP/sim.log")" -ge 3 ]
+sonuc "$A" $?
+
 exit $fail

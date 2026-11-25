@@ -27,6 +27,7 @@ seçim kendiliğinden silinir.
 | Seçili odalar 2 kez yavaşça yanıp söner | Tamam, robot yola çıktı |
 | Tüm LED'ler 6 kez hızlı yanıp söner | Hata (Wi-Fi'ye ya da robota ulaşılamadı) |
 | Tüm LED'ler 2 kez kısa yanıp söner | Hiç oda seçmeden Başlat'a bastın |
+| Bir oda LED'i 3 kez hızlı yanıp söner | O oda bu robotta tanımlı değil (`config.h`'de segment 0) |
 | Kartın mavi LED'i yavaş yanıp sönüyor | Wi-Fi bağlantısı yok |
 | Fişe takınca LED'ler sırayla yanıp söner | Kumanda çalışıyor |
 
@@ -188,13 +189,18 @@ başladığında robot yeni bir IP alabilir ve kumanda çalışmayı bırakır.
 4. `config.h` sekmesinde şunları düzenle:
    - Wi-Fi adı ve şifresi (**2.4 GHz** ağ olmalı)
    - Kurulum betiğinin verdiği satırlar (`ROBOT_IP`, `LOCAL_KEY`, `ODALAR`)
-   - `KUMANDA_IP` için ağında boş bir adres yaz (ya da `KUMANDA_SABIT_IP`
-     satırının başına `//` koyup bu kısmı kapat)
 5. Kartı seç: **"ESP32 Dev Module"**. Portu seç (*Araçlar → Port*).
 6. *Yükle*'ye bas. Yükleme başlamazsa kartın üstündeki **BOOT** düğmesini
    "Connecting..." yazısı çıkana kadar basılı tut.
 7. Yükleme bitince *Seri Monitör*'ü aç (115200 baud) ve bir butona bas. Ne olup
    bittiğini satır satır görürsün.
+
+### Başka bir robota geçmek
+
+Önce bir robotla test edip sonra asıl robota geçebilirsin. Asıl robotun olduğu evde,
+o evin Wi-Fi'sine bağlı bir bilgisayarda `kurulum.py`'yi çalıştır. Çıkan `ROBOT_IP`,
+`LOCAL_KEY` ve segment numaralarını `config.h`'ye yaz. Wi-Fi değiştiyse onu da yaz ve
+programı tekrar yükle. Kutuya ve kablolara dokunmana gerek yok.
 
 ### 4. Kutuyu topla
 
@@ -215,12 +221,14 @@ başladığında robot yeni bir IP alabilir ve kumanda çalışmayı bırakır.
 | `MESGULSE_DURDUR` | Robot o an başka bir iş yapıyorsa: 1 = durdurup yeni odalara geçer, 0 = hata verir |
 | `EVE_DON_PIN` | "Eve Dön" butonunun pini. Bu butonu istemiyorsan -1 yap |
 | `DURUM_LED_PIN` | Kartın mavi LED'i (2). İstemiyorsan -1 |
+| `ODALAR` segment `0` | Robotun haritasında karşılığı olmayan oda: butona basınca LED'i 3 kez yanıp söner, seçilmez |
+| `KUMANDA_SABIT_IP` | Varsayılan kapalı (modem otomatik IP verir). Açmak için başındaki `//` işaretini kaldır |
 
 ## Sorun giderme
 
 | Belirti | Çözüm |
 |---|---|
-| Kartın mavi LED'i sürekli yanıp sönüyor | Wi-Fi'ye bağlanamıyor. Anten takılı mı? Wi-Fi adı/şifresi doğru mu? Ağ 2.4 GHz mi? Sabit IP'yi kapatıp (`KUMANDA_SABIT_IP` satırının başına `//` koyarak) dene. |
+| Kartın mavi LED'i sürekli yanıp sönüyor | Wi-Fi'ye bağlanamıyor. Anten takılı mı? Wi-Fi adı/şifresi doğru mu? Ağ 2.4 GHz mi? Sabit IP'yi açtıysan (`KUMANDA_SABIT_IP`) kapatıp dene. |
 | LED yanmıyor | LED ters takılmış olabilir. Uzun bacak (+) dirence, kısa bacak GND'ye gitmeli. |
 | LED çok soluk | Mavi ya da beyaz LED'de 330 Ω büyük gelir, 68–100 Ω kullan. |
 | 6 hızlı yanıp sönme, Seri Monitör'de "Robota baglanilamadi" | `ROBOT_IP` doğru mu? Robot ile ESP32 aynı ağda mı? Misafir ağı ya da "AP izolasyonu" açıksa kapat. |

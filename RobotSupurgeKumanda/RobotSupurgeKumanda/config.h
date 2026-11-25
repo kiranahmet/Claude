@@ -10,9 +10,10 @@
 #define WIFI_SSID      "EvAgi"
 #define WIFI_PASSWORD  "wifi-sifresi"
 
-// Sabit IP (isteğe bağlı). Kullanmak istemezsen KUMANDA_SABIT_IP
-// satırının başına // koy; o zaman modem otomatik IP verir.
-#define KUMANDA_SABIT_IP
+// Sabit IP (isteğe bağlı, genelde gerekmez). Kumanda hep açık olduğu için
+// modemin otomatik verdiği IP yeterli. Kullanmak istersen aşağıdaki satırın
+// başındaki // işaretini kaldır ve KUMANDA_IP'ye ağında boş bir adres yaz.
+// #define KUMANDA_SABIT_IP
 #define KUMANDA_IP     192, 168, 1, 250   // ağında boş bir adres
 #define AG_GECIDI      192, 168, 1, 1     // modem adresi
 #define ALT_AG         255, 255, 255, 0
@@ -24,6 +25,8 @@
 #define LOCAL_KEY      "xxxxxxxxxxxxxxxx" // 16 karakter, kurulum.py verir
 
 // --- Odalar: buton pini, LED pini, Roborock oda (segment) numarası ------
+// Segment 0 = bu robotta karşılığı yok: butona basınca LED'i 3 kez yanıp
+// söner, oda seçilmez.
 // Buton pinleri: 32 33 25 26 27 14 13 4  (34-39 ve 12'yi KULLANMA)
 // LED pinleri  : 23 22 21 19 18 17 16
 struct Oda {

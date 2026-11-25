@@ -14,6 +14,7 @@
 //   seçili odalar 2 kez yavaş yanıp söner  : tamam, robot yola çıktı
 //   tüm LED'ler 6 kez hızlı yanıp söner    : hata (Wi-Fi ya da robot)
 //   tüm LED'ler 2 kez kısa yanıp söner     : oda seçmeden Başlat'a basıldı
+//   bir oda LED'i 3 kez hızlı yanıp söner  : o oda bu robotta tanımlı değil (segment 0)
 //   kartın mavi LED'i yavaş yanıp sönüyor  : Wi-Fi bağlantısı yok
 //   açılışta LED'ler sırayla yanar         : kumanda çalışıyor
 //
@@ -269,6 +270,12 @@ static void butonaBasildi(int pin) {
 
   for (size_t i = 0; i < ODA_SAYISI; i++) {
     if (pin != ODALAR[i].butonPin) continue;
+    if (ODALAR[i].segment == 0) {  // bu robotun haritasında karşılığı yok
+      Serial.printf("%s bu robotta tanimli degil (segment 0)\n", ODALAR[i].ad);
+      yanSon(1UL << i, 3, 80, 80);
+      ledleriGoster(secim);
+      return;
+    }
     secim ^= 1UL << i;  // seç / seçimi kaldır
     ledleriGoster(secim);
     Serial.printf("%s %s\n", ODALAR[i].ad, (secim & (1UL << i)) ? "secildi" : "kaldirildi");
