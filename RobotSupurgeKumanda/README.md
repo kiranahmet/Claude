@@ -46,8 +46,18 @@ Başlat butonu için farklı renkte (örneğin yeşil) bir buton seçersen kulla
 **Butonlar:** Bir ucu **3.3V**'a, diğer ucu ESP32 pinine bağlanır. Dirence
 gerek yok, ESP32'nin içindeki dirençler kullanılıyor.
 
-**LED'ler:** ESP32 pini → 330 Ω direnç → LED'in uzun bacağı (+). LED'in kısa
-bacağı (−) **GND**'ye gider.
+**LED'ler:** ESP32 pini → direnç → LED'in uzun bacağı (+). LED'in kısa
+bacağı (−) **GND**'ye gider. LED'ler doğrudan ESP32 pininden beslenir, ek güç
+gerekmez (6 LED toplam ~25 mA, ESP32 pin başına 20 mA'i rahat verir).
+Direnci LED rengine göre seç (ESP32 pinleri 3.3V verir):
+
+| LED rengi | Direnç |
+|---|---|
+| Kırmızı, sarı, turuncu | 330 Ω |
+| Yeşil | 220 Ω |
+| Mavi, beyaz | 68–100 Ω (330 Ω ile çok soluk yanar) |
+
+Direnci asla atlama: dirençsiz LED hem kendini hem ESP32'nin pinini bozabilir.
 
 | Oda | Buton pini | LED pini |
 |---|---|---|
@@ -251,7 +261,7 @@ başladığında robot yeni bir IP alabilir ve kumanda çalışmayı bırakır.
 
 | Ayar | Ne işe yarar |
 |---|---|
-| `ADAPTOR_MODU` | 1 = prizden besleniyor (hiç uyumaz), 0 = pille çalışıyor (boştayken uyur) |
+| `ADAPTOR_MODU` | 1 = prizden besleniyor (hiç uyumaz, varsayılan), 0 = pille çalışıyor (boştayken uyur) |
 | `SECIM_ZAMAN_ASIMI_MS` | Bu kadar milisaniye butona basılmazsa seçim silinir ve kutu uyur (varsayılan 30000 = 30 sn) |
 | `BOS_BASLAT_TUM_EV` | Oda seçmeden Başlat'a basılırsa: 1 = bütün evi süpürür, 0 = hiçbir şey yapmaz |
 | `TEKRAR_SAYISI` | Her oda kaç tur süpürülsün (1–3) |

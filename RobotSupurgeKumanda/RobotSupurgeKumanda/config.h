@@ -11,7 +11,7 @@
 //     Başlat'a basınca robot anında yola çıkar.
 // 0 = pil (18650 + TP4056 + MT3608): boştayken derin uykuya geçer.
 #ifndef ADAPTOR_MODU
-#define ADAPTOR_MODU   0
+#define ADAPTOR_MODU   1
 #endif
 
 // --- Wi-Fi (2.4 GHz ağ olmalı; ESP32 5 GHz'e bağlanamaz) -------------

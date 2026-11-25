@@ -9,7 +9,8 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
 { echo '#include "Arduino.h"'; cat ../RobotSupurgeKumanda/RobotSupurgeKumanda.ino; } >"$TMP/sketch.cpp"
-g++ -std=gnu++17 -Wall -Wextra -O1 -Isim -I../RobotSupurgeKumanda -o "$TMP/sim" \
+# Pil modu senaryoları (derin uyku davranışı)
+g++ -std=gnu++17 -Wall -Wextra -O1 -DADAPTOR_MODU=0 -Isim -I../RobotSupurgeKumanda -o "$TMP/sim" \
   "$TMP/sketch.cpp" sim/sim_main.cpp ../RobotSupurgeKumanda/roborock_local.cpp -lmbedcrypto
 
 fail=0
