@@ -30,7 +30,9 @@ Kutu boştayken uykudadır, herhangi bir butona basınca uyanır. 30 saniye hiç
 
 | Malzeme | Adet | Not |
 |---|---|---|
-| ESP32 DevKit (elindeki) | 1 | |
+| ESP32 DevKit (elindeki, WROOM-32U) | 1 | Harici anten gerekir, aşağıya bak |
+| 18650 pil + TP4056 + MT3608 | 1'er | Pil ile çalışmak için |
+| 100 kΩ direnç | 2 | Pil uyarısı için (isteğe bağlı) |
 | Buton (12 mm, anlık / basınca kapanan) | 8 | 6 oda + Başlat + Eve Dön |
 | 5 mm LED | 6 | Her odanın üstüne bir tane |
 | 330 Ω direnç | 6 | Her LED'e bir tane |
@@ -78,47 +80,60 @@ bacağı (−) **GND**'ye gider.
   için 17 yerine **5** kullan ve `config.h`'de de değiştir.
 - Kartın üstündeki mavi LED (GPIO2) komut gönderilirken yanar.
 
-## Güç: prizden mi, pille mi?
-
-| Yöntem | Çalışır mı? | Pil ömrü (2000 mAh) |
-|---|---|---|
-| **USB şarj adaptörü** (telefon şarj aleti) | Evet, en kolayı | Sınırsız |
-| Pil + **5V yükseltici** (MT3608, XL6009, powerbank kartı) → ESP32'nin **5V/VIN** pini | Evet | Yaklaşık **1 hafta** |
-| Pil + **ayarlı düşürücü** (LM2596, Mini-360) | **Hayır**. Tek Li-ion pil (3.0–4.2V), 3.3V çıkış için yetmez | – |
-| Pil + **AMS1117-3.3 modülü** | **Hayır**. Aynı sorun, pil yarılanınca kart kapanır | – |
-| Pil + **düşük tüketimli 3.3V regülatör** → ESP32'nin **3V3** pini | Evet, en iyisi | **Aylarca** |
-
-**Neden 5V yükseltici ile pil kısa gider?** Yükseltici kart, ESP32'nin kendi
-regülatörü ve kırmızı güç LED'i, kutu uykudayken bile sürekli akım çeker.
-
-**Düşük tüketimli 3.3V regülatör:** HT7333 bulamazsan şunlardan herhangi biri
-aynı işi görür: **MCP1700-3302**, **XC6206P332**, **ME6211C33**, **HT7533**.
-Hepsi çok ucuz (birkaç lira) ve küçük parçalar.
-
-### Elindeki 5V yükseltici kartla bağlantı
+## Güç: 18650 pil + TP4056 + MT3608
 
 ```
-18650 pil ── TP4056 (B+ / B−) ── TP4056 (OUT+ / OUT−) ── yükseltici IN+ / IN−
-                                                         yükseltici OUT+ ── ESP32 VIN (5V)
-                                                         yükseltici OUT− ── ESP32 GND
+                 TP4056 şarj modülü            MT3608 yükseltici          ESP32
+ 18650 (+) ───── B+                OUT+ ────── VIN+          VOUT+ ────── 5V (ya da VIN)
+ 18650 (−) ───── B−                OUT− ────── VIN−          VOUT− ────── GND
+                 (USB: şarj girişi)
 ```
 
-> **DİKKAT:** Ayarlı yükseltici kartlar 12V, hatta 28V'a kadar çıkabilir ve
-> ESP32'yi yakar. ESP32'yi bağlamadan **önce** kartın çıkışını multimetreyle ölç ve
-> üstündeki trimpotu çevirerek **5.0V**'a ayarla.
+**Sırayla yap:**
+1. **MT3608'i ayarla, ESP32'yi henüz bağlama!** Pili ve TP4056'yı MT3608'e bağla.
+   MT3608'in çıkışını (VOUT+ / VOUT−) multimetreyle ölç. Üstündeki küçük mavi
+   trimpotun vidasını çevirerek **5.0V**'a getir. Ayarsız haliyle 12V'un üstüne
+   çıkabilir ve ESP32'yi **yakar**. (Saat yönünün tersine çevirmek genelde voltajı düşürür.
+   İlk birkaç turda değer değişmeyebilir, çevirmeye devam et.)
+2. 5.0V'u gördükten sonra VOUT+ ucunu ESP32'nin **5V** pinine (bazı kartlarda **VIN**
+   yazar), VOUT− ucunu **GND**'ye bağla.
+3. Şarj etmek için TP4056'nın USB girişine telefon şarj aletini tak. Kutunun
+   altında bunun için ikinci bir delik var. Şarj olurken kırmızı ışık yanar, dolunca mavi/yeşil yanar.
 
-Pil ömrünü uzatmak için ESP32 kartındaki kırmızı güç LED'ini sökebilirsin. Bu
-1 haftayı yaklaşık 2 haftaya çıkarır.
+**TP4056'nın iki türü var:**
+- Üzerinde **B+ B− OUT+ OUT−** yazan 6 uçlu türü (korumalı): yukarıdaki gibi bağla.
+- Sadece **B+ B−** yazan 4 uçlu türü (korumasız): MT3608'i de B+ / B− uçlarına bağla. Bu türde pil
+  tamamen bitince koruma devresi kesmez. Pil uyarısı yanınca şarj etmeyi unutma.
 
-### Düşük tüketimli regülatörle bağlantı (aylarca dayanır)
+**Pil ömrü:** 2000–3000 mAh'lik bir 18650 pil yaklaşık **1–2 hafta** gider.
+ESP32 kartındaki kırmızı güç LED'ini sökersen ya da yolunu kesersen bu süre yaklaşık iki katına çıkar.
+
+**Programlarken:** ESP32'ye USB kablosu takacağın zaman pili çıkar (ya da MT3608'in
+çıkış kablosunu ayır). Aynı anda iki kaynaktan beslemek karta zarar verebilir.
+
+### Pil uyarısı (önerilir)
+
+Haftada bir şarj gerekeceği için pil uyarısını açmanı öneririm. İki adet **100 kΩ**
+dirençle bölücü yap:
 
 ```
-18650 pil ── TP4056 ── OUT+ ── regülatör IN    regülatör OUT ── ESP32 3V3 pini
-                       OUT− ── regülatör GND ─────────────────── ESP32 GND
+18650 (+) ──[100kΩ]──┬──[100kΩ]── GND
+                     └── ESP32 GPIO35
 ```
 
-Bu bağlantıda kart **VIN/5V** pininden değil, **3V3** pininden beslenir. Ayrıca
-kırmızı güç LED'ini de sök. Programlarken USB kablosu takılıysa pili çıkar.
+`config.h`'de `#define PIL_PIN 35` yap. Pil 3.45V'un altına düşünce her komuttan sonra
+tüm LED'ler 3 kez uzun yanar. Bölücü çok az akım çeker (0.02 mA), pil ömrünü etkilemez.
+
+### Anten (ESP32-WROOM-32U)
+
+**32U** modülünün kendi anteni yoktur. Üzerinde harici anten için küçük bir
+**IPEX/U.FL** soket bulunur. **Anten takmazsan Wi-Fi çalışmaz** ya da çok zayıf kalır.
+
+- **Çubuk anten (RP-SMA) ile:** IPEX → RP-SMA ara kablosunu modüle tak. Soketi kutunun
+  **üst duvarındaki deliğe** somunuyla sabitle, anteni dışarıdan vidala.
+- **Yapışkanlı ince (FPC) anten ile:** Kutunun içine, metal ve kablolardan uzak bir
+  duvara yapıştır. Plastik sinyali engellemez. Bu durumda üst duvardaki anten deliğine
+  gerek yoktur (`kutu.scad`'de `anten_deligi = false` yap).
 
 ## 3D baskı kutu
 
@@ -138,6 +153,9 @@ kırmızı güç LED'ini de sök. Programlarken USB kablosu takılıysa pili ç�
 - Kapağın iç yüzünde her deliğin yanına **ESP32 pin numarası** yazılı. Kablolarken neyi nereye bağlayacağını oradan görürsün.
 - Gövdenin içinde ESP32 için 4 ayak var. Kart, altına jumper kablo sığacak yükseklikte oturur, USB girişi alttaki delikten dışarı bakar.
 - 18650 pil yuvası için kızak ve TP4056 şarj modülü için ikinci bir USB deliği var.
+  MT3608'i pilin yanına çift taraflı bantla yapıştırabilirsin.
+- Üst duvarda RP-SMA anten soketi için delik var (ESP32-WROOM-32U için).
+- Kart yuvası hem 30 pinli (51.5 mm) hem 38 pinli (55 mm) ESP32 kartlarına uyar.
 - Duvara asmak için arkada 2 anahtar deliği var (vida başı en fazla 8 mm).
 - Kapak 4 adet M3 vidayla (ya da 3 mm sunta vidasıyla) kapanır. Vida boyu 10–12 mm olmalı.
 
@@ -227,6 +245,7 @@ başladığında robot yeni bir IP alabilir ve kumanda çalışmayı bırakır.
 |---|---|
 | LED yanmıyor | LED ters takılmış olabilir. Uzun bacak (+) dirence, kısa bacak GND'ye gitmeli. |
 | 6 hızlı yanıp sönme, Seri Monitör'de "Wi-Fi baglanamadi" | Wi-Fi adını ve şifresini kontrol et. Ağ 2.4 GHz mi? Sabit IP'yi kapatıp (`KUMANDA_SABIT_IP` satırının başına `//` koyarak) dene. |
+| Wi-Fi hiç bağlanmıyor ya da bazen bağlanıyor | Kartın WROOM-32U ise anten takılı mı? Anten olmadan çalışmaz. |
 | "Robota baglanilamadi" | `ROBOT_IP` doğru mu? Robot ile ESP32 aynı ağda mı? Misafir ağı ya da "AP izolasyonu" açıksa kapat. |
 | "yanit zaman asimi" | `LOCAL_KEY` yanlış olabilir. Robotu sıfırladıysan ya da uygulamaya yeniden eklediysen key değişir, `kurulum.py`'yi tekrar çalıştır. |
 | Yanlış oda süpürülüyor | Haritayı yeniden oluşturduysan oda numaraları değişir. `kurulum.py`'yi tekrar çalıştır. |

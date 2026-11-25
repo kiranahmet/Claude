@@ -45,9 +45,11 @@ baslik        = "ROBOT SÜPÜRGE";
 pin_yazilari  = true;  // kapağın içine bağlantı pin numaralarını yaz
 
 /* [ESP32 kartı] */
-kart_en   = 28.5;  // 30 pinli DevKit: 28.5 / 38 pinli: 28
-kart_boy  = 52;    // 30 pinli DevKit: 51.5 / 38 pinli: 55
+// Varsayılan ölçü hem 30 pinli (51.5 mm) hem 38 pinli (55 mm) kartlara uyar.
+kart_en   = 28.8;
+kart_boy  = 55.8;
 kart_ayak = 16;    // kartın tabandan yüksekliği (altına jumper kablo sığsın)
+ayak_ic   = 2.5;   // ayağın kartın altına girdiği mesafe (uçtaki pinlere değmesin)
 usb_en    = 13;
 usb_yuk   = 9;
 
@@ -59,6 +61,11 @@ pil_yuk    = 20;
 pil_y      = 40;
 sarj_portu = true;  // TP4056 şarj modülü için ikinci USB deliği
 sarj_x     = 30;
+
+/* [Anten (ESP32-WROOM-32U için)] */
+anten_deligi = true;  // üst duvarda RP-SMA anten soketi için delik
+anten_cap    = 6.6;   // RP-SMA panel soketi: 6.4-6.6 mm
+anten_z      = 36;
 
 /* [Duvar askısı] */
 duvar_askisi = true;  // arkaya 2 adet anahtar deliği (vida başı ≤ 8 mm)
@@ -111,11 +118,14 @@ module esp32_ayaklari() {
   for (sx = [-1, 1], uc = [0, 1]) {
     kx = sx * kart_en / 2;
     ky = kart_y0 + uc * kart_boy;
-    // 6.2 mm'lik blok, kart köşesinden 1.5 mm dışarı taşar (kenar tutucu)
-    x0 = sx > 0 ? kx + 1.5 - 6.2 : kx - 1.5;
-    y0 = uc > 0 ? ky + 1.5 - 6.2 : ky - 1.5;
+    // Blok, kart köşesinden 1.5 mm dışarı taşar (kenar tutucu). Kartın altına
+    // yanlardan 4.7 mm, uçlardan yalnızca ayak_ic kadar girer (pinlere değmez).
+    bx = 6.2;
+    by = 1.5 + ayak_ic;
+    x0 = sx > 0 ? kx + 1.5 - bx : kx - 1.5;
+    y0 = uc > 0 ? ky + 1.5 - by : ky - 1.5;
     difference() {
-      translate([x0, y0, taban - 0.01]) cube([6.2, 6.2, kart_ayak + 2.5]);
+      translate([x0, y0, taban - 0.01]) cube([bx, by, kart_ayak + 2.5]);
       // kartın oturduğu cep
       translate([-kart_en / 2 - bosluk, kart_y0 - bosluk, taban + kart_ayak])
         cube([kart_en + 2 * bosluk, kart_boy + 2 * bosluk, 10]);
@@ -165,6 +175,9 @@ module govde() {
     if (sarj_portu)
       translate([sarj_x - 6, -H / 2 - 1, taban + 1]) cube([12, duvar + 2, 7]);
     if (duvar_askisi) aski_deligi();
+    // anten soketi deliği (üst duvar, ortada)
+    if (anten_deligi)
+      translate([0, H / 2 + 1, anten_z]) rotate([90, 0, 0]) cylinder(d = anten_cap, h = duvar + 2);
   }
 }
 
