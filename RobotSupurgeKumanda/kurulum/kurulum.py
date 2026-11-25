@@ -18,8 +18,12 @@ silebilirsin (silmen önerilir, Roborock hesabına erişim anahtarı içerir).
 
 import asyncio
 import json
+import logging
 import sys
 from pathlib import Path
+
+# Kütüphanenin iç uyarı mesajları ekranı doldurmasın
+logging.basicConfig(level=logging.CRITICAL)
 
 try:
     from roborock.devices.device_manager import UserParams, create_device_manager
@@ -98,6 +102,12 @@ async def main():
         if not cihazlar:
             print("Hesapta desteklenen süpürge bulunamadı.")
             return
+        print("Hesaptaki robotlar:")
+        for i, c in enumerate(cihazlar, 1):
+            print(f"  {i}) {c.name}  ({c.product.model})")
+        secim = input("Kumandayı hangi robot için kuruyorsun? Numarasını yaz (boş = hepsi): ").strip()
+        if secim.isdigit() and 1 <= int(secim) <= len(cihazlar):
+            cihazlar = [cihazlar[int(secim) - 1]]
         for cihaz in cihazlar:
             try:
                 await kur(cihaz)
@@ -121,7 +131,12 @@ async def giris_yap():
         except Exception:  # noqa: BLE001 - bozuk kayıt: yeniden giriş yap
             pass
 
-    email = input("Roborock uygulamasındaki e-posta adresin: ").strip()
+    while True:
+        email = input("Roborock uygulamasındaki e-posta adresin: ").strip()
+        if "@" in email:
+            break
+        print("  Telefon numarasıyla giriş desteklenmiyor, sadece e-posta ile giriş yapılabiliyor.")
+        print("  Roborock hesabına bağlı e-posta adresini yaz.")
     api = RoborockApiClient(email)
     print("Doğrulama kodu e-postana gönderiliyor...")
     await api.request_code()
@@ -150,30 +165,48 @@ async def kur(cihaz):
     print(f"Key   : {key}")
 
     await p.rooms.refresh()
-    odalar = {r.segment_id: r.name for r in (p.rooms.rooms or [])}
+    odalar = {r.segment_id: r.name for r in (p.rooms.rooms or []) if r.raw_name}
+    # İsim verilmemiş odalar yukarıdaki listede yok; haritanın kendisinden bul
+    print("\nHarita okunuyor (isimsiz odaları da bulmak için, 30 sn sürebilir)...")
+    try:
+        await asyncio.wait_for(p.map_content.refresh(), 45)
+        harita = p.map_content.map_data
+        for seg in sorted((harita.rooms or {}) if harita else {}):
+            odalar.setdefault(int(seg), None)
+    except Exception:  # noqa: BLE001
+        print("  (Harita okunamadı, yalnızca isim verilmiş odalar gösteriliyor.)")
     print("\nRobotun haritasındaki odalar:")
     for seg, ad in sorted(odalar.items()):
-        print(f"  segment {seg:>3} = {ad}")
+        print(f"  segment {seg:>3} = {ad or '(isimsiz oda)'}")
+    if any(ad is None for ad in odalar.values()):
+        print("  İsimsiz odaların hangisi olduğunu bulmak için ya Roborock uygulamasında odalara")
+        print("  isim verip betiği tekrar çalıştır, ya da aşağıdaki süpürme testinde numarasını")
+        print("  yazıp robotun hangi odaya gittiğine bak.")
 
     print("\nYerel bağlantı (ESP32'nin kullanacağı yol) test ediliyor...")
+    yerel_ok = False
     try:
         surum, durum = await yerel_komut(ip, key, cihaz.duid, "get_status")
-        pil = durum[0].get("battery") if isinstance(durum, list) and durum else "?"
+        ilk = durum[0] if isinstance(durum, list) and durum else durum
+        pil = ilk.get("battery", "?") if isinstance(ilk, dict) else "?"
         print(f"  TAMAM: robot yerel ağdan yanıt verdi (protokol {surum}, pil %{pil}).")
+        yerel_ok = True
     except Exception as e:  # noqa: BLE001
         print(f"  SORUN: yerel bağlantı kurulamadı: {e}")
-        print("  - ESP32 ile robot aynı ağda mı? Misafir ağı / AP izolasyonu kapalı mı?")
-        print("  - Bilgisayarın da aynı Wi-Fi'de olmalı.")
+        print("  - Bu robot BAŞKA BİR EVDE olabilir. Çoğu modem aynı 192.168.1.x adreslerini")
+        print("    kullandığı için IP tanıdık görünebilir. Kumanda robotla aynı evde olmalı ve")
+        print("    bu betik de o evin Wi-Fi'sine bağlı bir bilgisayarda çalıştırılmalı.")
+        print("  - Aynı evdeyse: robot açık mı, misafir ağı / AP izolasyonu kapalı mı?")
 
     # config.h için hazır satırlar
-    ad_to_seg = {sade(ad): seg for seg, ad in odalar.items()}
+    ad_to_seg = {sade(ad): seg for seg, ad in odalar.items() if ad}
     print("\n---------------- config.h'ye yapıştır ----------------")
     print(f"#define ROBOT_IP       {ip.replace('.', ', ')}")
     print(f'#define LOCAL_KEY      "{key}"')
     print("\nstatic const Oda ODALAR[] = {")
     print("  // ad              buton  LED  segment")
     for ad, buton, led in ODALAR:
-        seg = ad_to_seg.get(sade(ad))
+        seg = ad_to_seg.get(sade(ad)) if ad_to_seg else None
         yorum = "" if seg else "   // <-- eşleşmedi: yukarıdaki listeden doğru numarayı yaz"
         ad_alani = f'"{ad}",'
         print(f"  {{{ad_alani:<17} {buton:>3},   {led:>3},  {seg or 0}}},{yorum}")
@@ -181,10 +214,14 @@ async def kur(cihaz):
     print("------------------------------------------------------\n")
     print("ÖNEMLİ: Modem arayüzünden robota sabit IP ver (DHCP rezervasyonu).")
 
-    cevap = input("\nGerçek bir oda süpürme testi yapalım mı? Segment numarası yaz (boş = geç): ").strip()
-    if cevap.isdigit():
+    if not yerel_ok:
+        return
+    while True:
+        cevap = input("\nOda süpürme testi: segment numarası yaz (boş = bitir): ").strip()
+        if not cevap.isdigit():
+            break
         seg = int(cevap)
-        print(f"'{odalar.get(seg, seg)}' süpürülüyor (yerel bağlantıyla)...")
+        print(f"'{odalar.get(seg) or seg}' süpürülüyor (yerel bağlantıyla)...")
         try:
             _, sonuc = await yerel_komut(ip, key, cihaz.duid, "app_segment_clean", [{"segments": [seg]}])
             print(f"  Robot yanıtı: {sonuc}")

@@ -227,6 +227,9 @@ başladığında robot yeni bir IP alabilir ve kumanda çalışmayı bırakır.
 | "yanit zaman asimi" | `LOCAL_KEY` yanlış olabilir. Robotu sıfırladıysan ya da uygulamaya yeniden eklediysen key değişir, `kurulum.py`'yi tekrar çalıştır. |
 | Yanlış oda süpürülüyor | Haritayı yeniden oluşturduysan oda numaraları değişir. `kurulum.py`'yi tekrar çalıştır. |
 | `kurulum.py` "NotImplementedError" ya da "MQTT ... timed out" hatası veriyor | Eski sürüm. Zip'teki güncel `kurulum.py`'yi kullan (Windows düzeltmesi var). |
+| `kurulum.py` telefon numarasını kabul etmiyor | Sadece e-posta ile giriş yapılabiliyor. Roborock hesabına bağlı e-posta adresini yaz. |
+| `kurulum.py` robotu görüyor ama "yerel bağlantı kurulamadı" diyor | Robot başka bir evde olabilir (paylaşılmış robot). Kumanda ve bu betik, robotla aynı evin Wi-Fi'sinde olmalı. |
+| Odalar listesinde "(isimsiz oda)" var | Roborock uygulamasında o odaya isim verip betiği tekrar çalıştır, ya da süpürme testinde numarasını yazıp robotun nereye gittiğine bak. |
 | Butona basınca tepki yok | Butonun bir ucu 3V3'e, diğeri doğru GPIO'ya mı bağlı? Seri Monitör'de "... secildi" yazısı çıkıyor mu? |
 
 ## Dosyalar
