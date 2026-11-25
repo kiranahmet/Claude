@@ -6,20 +6,12 @@
 #pragma once
 #include <stdint.h>
 
-// --- Güç kaynağı -------------------------------------------------------
-// 1 = USB adaptör (prizden): kutu hiç uyumaz, Wi-Fi hep bağlı kalır,
-//     Başlat'a basınca robot anında yola çıkar.
-// 0 = pil (18650 + TP4056 + MT3608): boştayken derin uykuya geçer.
-#ifndef ADAPTOR_MODU
-#define ADAPTOR_MODU   1
-#endif
-
 // --- Wi-Fi (2.4 GHz ağ olmalı; ESP32 5 GHz'e bağlanamaz) -------------
 #define WIFI_SSID      "EvAgi"
 #define WIFI_PASSWORD  "wifi-sifresi"
 
-// Sabit IP önerilir: uyanınca Wi-Fi'ye daha hızlı bağlanır.
-// Kullanmak istemezsen KUMANDA_SABIT_IP satırının başına // koy.
+// Sabit IP (isteğe bağlı). Kullanmak istemezsen KUMANDA_SABIT_IP
+// satırının başına // koy; o zaman modem otomatik IP verir.
 #define KUMANDA_SABIT_IP
 #define KUMANDA_IP     192, 168, 1, 250   // ağında boş bir adres
 #define AG_GECIDI      192, 168, 1, 1     // modem adresi
@@ -32,9 +24,8 @@
 #define LOCAL_KEY      "xxxxxxxxxxxxxxxx" // 16 karakter, kurulum.py verir
 
 // --- Odalar: buton pini, LED pini, Roborock oda (segment) numarası ------
-// Buton pinleri uykudan uyandırabilen pinler olmalı:
-//   32 33 25 26 27 14 13 4   (12'yi KULLANMA, basılıyken kart açılmaz)
-// LED pinleri herhangi bir çıkış pini olabilir: 23 22 21 19 18 17 16
+// Buton pinleri: 32 33 25 26 27 14 13 4  (34-39 ve 12'yi KULLANMA)
+// LED pinleri  : 23 22 21 19 18 17 16
 struct Oda {
   const char* ad;
   uint8_t butonPin;
@@ -58,13 +49,15 @@ static const Oda ODALAR[] = {
 // Eve Dön butonu: robotu durdurup istasyona gönderir. İstemezsen -1 yap.
 #define EVE_DON_PIN    4
 
-// Durum LED'i (isteğe bağlı). ESP32 DevKit'in kendi mavi LED'i: 2.
-// Komut gönderilirken yanar. İstemezsen -1 yap.
+// Kartın kendi mavi LED'i (GPIO2): komut gönderilirken yanar,
+// Wi-Fi bağlantısı yokken yavaş yanıp söner. İstemezsen -1 yap.
 #define DURUM_LED_PIN  2
 
 // --- Davranış ---------------------------------------------------------
-// Bu süre boyunca hiçbir butona basılmazsa seçim silinir, kutu uyur.
+// Oda seçildikten sonra bu süre içinde Başlat'a basılmazsa seçim silinir.
+#ifndef SECIM_ZAMAN_ASIMI_MS
 #define SECIM_ZAMAN_ASIMI_MS 30000
+#endif
 
 // Hiç oda seçmeden Başlat'a basılırsa: 1 = bütün evi süpür, 0 = bir şey yapma
 #define BOS_BASLAT_TUM_EV 0
@@ -75,10 +68,3 @@ static const Oda ODALAR[] = {
 // Robot zaten çalışırken Başlat'a basılırsa: mevcut işi durdurup yeni
 // odalara geçsin mi? (1 = evet, 0 = hayır, hata ışığı yanar)
 #define MESGULSE_DURDUR 1
-
-// --- Pil ölçümü (isteğe bağlı) -----------------------------------------
-// Pil + ucundan iki adet 100k dirençle bölücü yapıp ortasını GPIO35'e
-// bağlarsan pil zayıfladığında uyarı verir. Ölçüm yoksa -1 bırak.
-#define PIL_PIN        -1
-#define PIL_BOLUCU     2.0f
-#define PIL_DUSUK_V    3.45f

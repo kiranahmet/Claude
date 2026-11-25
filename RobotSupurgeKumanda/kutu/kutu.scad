@@ -53,15 +53,6 @@ ayak_ic   = 2.5;   // ayağın kartın altına girdiği mesafe (uçtaki pinlere 
 usb_en    = 13;
 usb_yuk   = 9;
 
-/* [Pil (isteğe bağlı)] */
-pil_yuvasi = true;  // 18650 pil yuvası için kızak
-pil_boy    = 78;
-pil_en     = 21.5;
-pil_yuk    = 20;
-pil_y      = 40;
-sarj_portu = true;  // TP4056 şarj modülü için ikinci USB deliği
-sarj_x     = 30;
-
 /* [Anten (ESP32-WROOM-32U için)] */
 anten_deligi = true;  // üst duvarda RP-SMA anten soketi için delik
 anten_cap    = 6.6;   // RP-SMA panel soketi: 6.4-6.6 mm
@@ -92,8 +83,6 @@ function oda_xy(i) = [(i % 3 - 1) * kolon, i < 3 ? satir1_y : satir2_y];
 // ------------------------------------------------------------------ kontroller
 
 echo(str("Buton alti yuksekligi: ", derinlik - buton_govde, " mm"));
-if (pil_yuvasi && taban + pil_yuk > derinlik - buton_govde)
-  echo("UYARI: pil yuvasi butonlara degiyor, 'derinlik' degerini artir!");
 if (taban + kart_ayak + 1.6 + 4 > derinlik - 2)
   echo("UYARI: ESP32 karti kapaga degiyor, 'derinlik' degerini artir!");
 
@@ -133,15 +122,6 @@ module esp32_ayaklari() {
   }
 }
 
-module pil_kizagi() {
-  ray_y = pil_en / 2 + 0.4 + 1;
-  ray_x = pil_boy / 2 + 0.4 + 1;
-  for (s = [-1, 1]) {
-    translate([-ray_x - 1, pil_y + s * ray_y - 1, taban - 0.01]) cube([2 * ray_x + 2, 2, 6]);
-    translate([s * ray_x - 1, pil_y - ray_y, taban - 0.01]) cube([2, 2 * ray_y, 6]);
-  }
-}
-
 module aski_dolgusu() {
   for (s = [-1, 1]) translate([s * aski_x, aski_y + 4.5, 0]) cylinder(r = 9, h = taban + 3);
 }
@@ -163,17 +143,13 @@ module govde() {
       }
       kose_vidalari() cylinder(r = 4.5, h = derinlik);
       esp32_ayaklari();
-      if (pil_yuvasi) pil_kizagi();
       if (duvar_askisi) aski_dolgusu();
     }
     // vida pilot delikleri (M3 sunta vidası / M3 vida)
     kose_vidalari() translate([0, 0, derinlik - 14]) cylinder(d = 2.6, h = 15);
-    // ESP32 USB deliği (alt duvar)
+    // ESP32 USB deliği (alt duvar): adaptör kablosu buradan karta takılır
     usb_z = taban + kart_ayak + 1.6 + 1.5;
     translate([-usb_en / 2, -H / 2 - 1, usb_z - usb_yuk / 2]) cube([usb_en, duvar + 2, usb_yuk]);
-    // TP4056 şarj deliği
-    if (sarj_portu)
-      translate([sarj_x - 6, -H / 2 - 1, taban + 1]) cube([12, duvar + 2, 7]);
     if (duvar_askisi) aski_deligi();
     // anten soketi deliği (üst duvar, ortada)
     if (anten_deligi)

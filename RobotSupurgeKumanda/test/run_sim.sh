@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ESP32 programının buton akışını bilgisayarda, sahte robota karşı test eder.
 # Gerekenler: g++, libmbedtls-dev, python3 + `pip install python-roborock`
-set -euo pipefail
+set -uo pipefail
 cd "$(dirname "$0")"
 PY=${PYTHON:-python3}
 KEY="xxxxxxxxxxxxxxxx"   # config.h'deki örnek key
@@ -9,62 +9,62 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
 { echo '#include "Arduino.h"'; cat ../RobotSupurgeKumanda/RobotSupurgeKumanda.ino; } >"$TMP/sketch.cpp"
-# Pil modu senaryoları (derin uyku davranışı)
-g++ -std=gnu++17 -Wall -Wextra -O1 -DADAPTOR_MODU=0 -Isim -I../RobotSupurgeKumanda -o "$TMP/sim" \
-  "$TMP/sketch.cpp" sim/sim_main.cpp ../RobotSupurgeKumanda/roborock_local.cpp -lmbedcrypto
+# Zaman aşımı testi kısa sürsün diye 3 sn
+g++ -std=gnu++17 -Wall -Wextra -O1 -DSECIM_ZAMAN_ASIMI_MS=3000 -Isim -I../RobotSupurgeKumanda \
+  -o "$TMP/sim" "$TMP/sketch.cpp" sim/sim_main.cpp ../RobotSupurgeKumanda/roborock_local.cpp \
+  -lmbedcrypto || exit 1
 
 fail=0
-# $1 açıklama, $2 robotta beklenen metin ('-' = robota hiç gidilmemeli), $3 uyandıran pin, kalanlar basışlar
+# senaryo <açıklama> <süre_sn> <basışlar...>   (basış: pin@ms)
+# Ardından robot.log ve sim.log dosyalarına bakılarak kontrol edilir.
 senaryo() {
-  local ad=$1 bek=$2; shift 2
+  local sure=$2; shift 2
   local port=$((40000 + RANDOM % 20000))
   $PY fake_robot.py "$port" v1 "$KEY" >"$TMP/robot.log" 2>&1 &
   local pid=$!
   for _ in $(seq 50); do grep -q ready "$TMP/robot.log" && break; sleep 0.1; done
-  timeout 20 "$TMP/sim" "$port" "$@" >"$TMP/sim.log" 2>&1 || true
+  timeout "$sure" "$TMP/sim" "$port" -1 "$@" >"$TMP/sim.log" 2>&1
   sleep 0.2
-  kill "$pid" 2>/dev/null || true
-  local ok=1
-  grep -q "^UYKU" "$TMP/sim.log" || ok=0
-  if [ "$bek" = "-" ]; then
-    grep -q '"rpc"' "$TMP/robot.log" && ok=0
-  else
-    grep -qF "$bek" "$TMP/robot.log" || ok=0
-  fi
-  if [ $ok = 1 ]; then echo "OK   $ad"; else
-    echo "FAIL $ad"; cat "$TMP/sim.log"; cat "$TMP/robot.log"; fail=1; fi
-  cp "$TMP/sim.log" "$TMP/son_sim.log"
+  kill "$pid" 2>/dev/null
 }
+sonuc() {  # $1 açıklama, $2 = 0 başarılı
+  if [ "$2" = 0 ]; then echo "OK   $1"; else
+    echo "FAIL $1"; cat "$TMP/sim.log"; cat "$TMP/robot.log"; fail=1; fi
+}
+rpc_sayisi() { grep -c '"rpc"' "$TMP/robot.log"; }
 
-# Pinler (config.h): Mutfak 32, Oturma 33, Salon 25, Koridor 26, Cocuk 27, Yatak 14,
-#                    Başlat 13, Eve Dön 4
-senaryo "Mutfak ile uyan, Salon sec, Mutfak kaldir, Koridor sec, Baslat -> Salon+Koridor" \
-  '"segments": [18, 19]' 32 25@400 32@800 26@1200 13@1600
-# Seçilen odaların LED'leri yanmış olmalı (Salon LED 21, Koridor LED 19)
-grep -q "LED 21=1" "$TMP/son_sim.log" && grep -q "LED 19=1" "$TMP/son_sim.log" \
-  && echo "OK   secilen odalarin LED'leri yandi" || { echo "FAIL LED"; fail=1; }
+# Pinler (config.h): Mutfak 32/LED23, Oturma 33/22, Salon 25/21, Koridor 26/19,
+#                    Cocuk 27/18, Yatak 14/17, Başlat 13, Eve Dön 4
+A="Mutfak, Salon sec, Mutfak kaldir, Koridor sec, Baslat -> Salon+Koridor"
+senaryo "$A" 6 32@1500 25@1900 32@2300 26@2700 13@3100
+grep -qF '"segments": [18, 19]' "$TMP/robot.log" && [ "$(rpc_sayisi)" = 1 ] \
+  && grep -q "LED 21=1" "$TMP/sim.log" && grep -q "LED 19=1" "$TMP/sim.log"
+sonuc "$A" $?
 
-senaryo "Eve Don ile uyan -> istasyona don" '"method": "app_charge"' 4
-senaryo "Oda secmeden Baslat (bir sey olmamali), sonra Oturma Odasi + Baslat" \
-  '"segments": [17]' 13 33@700 13@1100
-senaryo "Butun odalari sec + Baslat" '"segments": [16, 17, 18, 19, 20, 21]' \
-  32 33@300 25@600 26@900 27@1200 14@1500 13@1900
-senaryo "Pil takildi (buton yok) -> robota gitmeden uyu" - -1
+A="Eve Don -> istasyona don"
+senaryo "$A" 4 4@1500
+grep -qF '"method": "app_charge"' "$TMP/robot.log"
+sonuc "$A" $?
 
-# --- Adaptör modu: kutu hiç uyumamalı, arka arkaya iki temizlik başlatılabilmeli
-g++ -std=gnu++17 -Wall -Wextra -O1 -DADAPTOR_MODU=1 -Isim -I../RobotSupurgeKumanda -o "$TMP/sim_adaptor" \
-  "$TMP/sketch.cpp" sim/sim_main.cpp ../RobotSupurgeKumanda/roborock_local.cpp -lmbedcrypto
-port=$((40000 + RANDOM % 20000))
-$PY fake_robot.py "$port" v1 "$KEY" >"$TMP/robot.log" 2>&1 &
-pid=$!
-for _ in $(seq 50); do grep -q ready "$TMP/robot.log" && break; sleep 0.1; done
-# Güç verildi (-1), Mutfak + Başlat, sonra Salon + Yatak + Başlat
-timeout 9 "$TMP/sim_adaptor" "$port" -1 32@1000 13@1400 25@5000 14@5400 13@5800 >"$TMP/sim.log" 2>&1 || true
-sleep 0.2; kill "$pid" 2>/dev/null || true
-if ! grep -q "^UYKU" "$TMP/sim.log" && grep -qF '"segments": [16]' "$TMP/robot.log" \
-   && grep -qF '"segments": [18, 21]' "$TMP/robot.log"; then
-  echo "OK   Adaptor modu: hic uyumadan arka arkaya iki temizlik"
-else
-  echo "FAIL Adaptor modu"; cat "$TMP/sim.log"; cat "$TMP/robot.log"; fail=1
-fi
+A="Oda secmeden Baslat (bir sey olmamali), sonra Oturma Odasi + Baslat"
+senaryo "$A" 5 13@1500 33@2000 13@2400
+grep -qF '"segments": [17]' "$TMP/robot.log" && [ "$(rpc_sayisi)" = 1 ]
+sonuc "$A" $?
+
+A="Butun odalari sec + Baslat"
+senaryo "$A" 6 32@1500 33@1800 25@2100 26@2400 27@2700 14@3000 13@3400
+grep -qF '"segments": [16, 17, 18, 19, 20, 21]' "$TMP/robot.log"
+sonuc "$A" $?
+
+A="Arka arkaya iki temizlik (kutu hic uyumaz)"
+senaryo "$A" 9 32@1500 13@1900 25@5000 14@5400 13@5800
+grep -qF '"segments": [16]' "$TMP/robot.log" && grep -qF '"segments": [18, 21]' "$TMP/robot.log" \
+  && ! grep -q "^UYKU" "$TMP/sim.log"
+sonuc "$A" $?
+
+A="Zaman asimi: secim silinir, sonra Baslat bir sey yapmaz"
+senaryo "$A" 7 32@1500 13@5500
+grep -q "Zaman asimi" "$TMP/sim.log" && [ "$(rpc_sayisi)" = 0 ]
+sonuc "$A" $?
+
 exit $fail

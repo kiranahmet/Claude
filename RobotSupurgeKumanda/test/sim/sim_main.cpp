@@ -1,6 +1,6 @@
 // ESP32 programını bilgisayarda çalıştırır. Buton basışları komut satırından
 // "pin@ms" biçiminde verilir (o anda 120 ms basılı tutulur).
-// Kullanım: sim <robot_port> <uyandiran_pin|-1> [pin@ms ...]
+// Kullanım: sim <robot_port> <ilk_basili_pin|-1> [pin@ms ...]
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <poll.h>
@@ -15,7 +15,6 @@
 
 #include "Arduino.h"
 #include "WiFi.h"
-#include "esp_sleep.h"
 
 HwSerial Serial;
 WiFiClass WiFi;
@@ -45,11 +44,6 @@ int digitalRead(int p) {
   for (auto& b : basislar) if (b.pin == p && m >= b.t && m < b.t + 120) return HIGH;
   return LOW;
 }
-esp_sleep_wakeup_cause_t esp_sleep_get_wakeup_cause() {
-  return uyandiran >= 0 ? ESP_SLEEP_WAKEUP_EXT1 : ESP_SLEEP_WAKEUP_UNDEFINED;
-}
-uint64_t esp_sleep_get_ext1_wakeup_status() { return uyandiran >= 0 ? 1ULL << uyandiran : 0; }
-void esp_deep_sleep_start() { printf("UYKU @%lu\n", millis()); fflush(stdout); exit(0); }
 
 int WiFiClient::connect(IPAddress, uint16_t, int32_t) {
   fd = socket(AF_INET, SOCK_STREAM, 0);

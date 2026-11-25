@@ -1,4 +1,4 @@
-// Roborock S8 oda kumandası — ESP32 (normal ESP32 DevKit / ESP32-WROOM)
+// Roborock S8 oda kumandası — ESP32 (ESP32-WROOM-32U DevKit), USB adaptörle beslenir
 //
 // Kullanım:
 //   1. Oda butonlarına bas: oda seçilir, üstündeki LED yanar.
@@ -6,23 +6,20 @@
 //   2. BAŞLAT'a bas: robot seçili odaları süpürmeye gider.
 //   3. EVE DÖN: robot ne yapıyorsa bırakır, istasyona döner.
 //
-// Pil modunda kutu boştayken derin uykudadır; herhangi bir butona basınca
-// uyanır. 30 sn hiçbir şeye basılmazsa seçim silinir ve tekrar uyur.
-// Adaptör modunda (config.h: ADAPTOR_MODU 1) hiç uyumaz, hep hazırdır.
+// Kutu prizden beslendiği için hiç uyumaz, Wi-Fi hep bağlı kalır; Başlat'a
+// basınca robot hemen yola çıkar. 30 sn içinde Başlat'a basılmazsa seçim silinir.
 //
 // LED kodları:
 //   seçili odaların LED'leri yanıp sönüyor : komut gönderiliyor
 //   seçili odalar 2 kez yavaş yanıp söner  : tamam, robot yola çıktı
 //   tüm LED'ler 6 kez hızlı yanıp söner    : hata (Wi-Fi ya da robot)
 //   tüm LED'ler 2 kez kısa yanıp söner     : oda seçmeden Başlat'a basıldı
-//   tüm LED'ler 3 kez çok uzun yanar       : pil zayıf
-//   pil takılınca tüm LED'ler sırayla yanar: kumanda hazır
+//   kartın mavi LED'i yavaş yanıp sönüyor  : Wi-Fi bağlantısı yok
+//   açılışta LED'ler sırayla yanar         : kumanda çalışıyor
 //
 // Ayarlar config.h içinde.
 
 #include <WiFi.h>
-#include <driver/rtc_io.h>
-#include <esp_sleep.h>
 #include <sys/time.h>
 #include <time.h>
 
@@ -32,16 +29,12 @@
 static const size_t ODA_SAYISI = sizeof(ODALAR) / sizeof(ODALAR[0]);
 static_assert(sizeof(ODALAR) / sizeof(ODALAR[0]) <= 30, "en fazla 30 oda");
 
-// Derin uykuda korunan bilgiler (hızlı yeniden bağlanma için)
-RTC_DATA_ATTR static bool rtcWifiGecerli = false;
-RTC_DATA_ATTR static uint8_t rtcKanal = 0;
-RTC_DATA_ATTR static uint8_t rtcBssid[6] = {0};
-RTC_DATA_ATTR static uint8_t rtcSurum = rr::V10;  // robotun konuştuğu protokol
-
 static uint32_t secim = 0;        // bit i = ODALAR[i] seçili
 static uint32_t sonEtkinlik = 0;  // son buton basımı (ms)
 static uint64_t oncekiPinler = 0;
 static uint32_t kilit[40] = {0};  // buton sıçrama (debounce) kilidi
+static uint8_t robotSurum = rr::V10;  // robotun konuştuğu protokol (ilk bağlantıda öğrenilir)
+static bool gonderiliyor = false;
 
 // ---------------------------------------------------------------- Transport
 
@@ -130,87 +123,40 @@ static uint64_t basiliPinler() {
 
 static void butonlariHazirla() {
   uint64_t m = butonMaskesi();
-  for (int p = 0; p < 40; p++) {
-    if (!(m & (1ULL << p))) continue;
-    rtc_gpio_deinit((gpio_num_t)p);  // uykudan kalan RTC ayarını bırak
-    pinMode(p, INPUT_PULLDOWN);
-  }
+  for (int p = 0; p < 40; p++)
+    if (m & (1ULL << p)) pinMode(p, INPUT_PULLDOWN);  // buton 3V3'e bağlı, basınca HIGH
 }
 
-// --------------------------------------------------------------------- Uyku
-
-static void uyu() {
-  if (ADAPTOR_MODU) {
-    // Prizden besleniyor: uyumaya gerek yok, Wi-Fi açık kalsın, hazırda bekle.
-    secim = 0;
-    ledleriGoster(0);
-    durumLed(false);
-    sonEtkinlik = millis();
-    return;
-  }
-  WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
+// Seçimi temizle, LED'leri söndür, yeni komut için hazır bekle
+static void hazirdaBekle() {
+  secim = 0;
   ledleriGoster(0);
   durumLed(false);
-
-  // Basılı tutulan buton bırakılana kadar bekle (en fazla 10 sn).
-  uint64_t maske = butonMaskesi();
-  uint32_t bas = millis();
-  while ((basiliPinler() & maske) && millis() - bas < 10000) delay(20);
-  maske &= ~basiliPinler();  // hâlâ basılı (arızalı) buton sürekli uyandırmasın
-
-  for (int p = 0; p < 40; p++) {
-    if (!(maske & (1ULL << p))) continue;
-    rtc_gpio_init((gpio_num_t)p);
-    rtc_gpio_set_direction((gpio_num_t)p, RTC_GPIO_MODE_INPUT_ONLY);
-    rtc_gpio_pullup_dis((gpio_num_t)p);
-    rtc_gpio_pulldown_en((gpio_num_t)p);
-  }
-  // Dahili pull-down dirençleri uykuda da çalışsın
-  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
-  if (maske) esp_sleep_enable_ext1_wakeup(maske, ESP_EXT1_WAKEUP_ANY_HIGH);
-  Serial.println("Uykuya geciliyor.");
-  Serial.flush();
-  esp_deep_sleep_start();
+  sonEtkinlik = millis();
 }
 
 // --------------------------------------------------------------------- Wi-Fi
 
 static uint32_t wifiBaslangic = 0;
-static bool wifiHizliDeneniyor = false;
 
-static void wifiBaslat(bool hizli) {
+static void wifiBaslat() {
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
 #ifdef KUMANDA_SABIT_IP
   WiFi.config(IPAddress(KUMANDA_IP), IPAddress(AG_GECIDI), IPAddress(ALT_AG),
               IPAddress(DNS_SUNUCU));
 #endif
-  wifiHizliDeneniyor = hizli && rtcWifiGecerli;
-  if (wifiHizliDeneniyor)
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD, rtcKanal, rtcBssid);
-  else
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   wifiBaslangic = millis();
 }
 
-// Arka planda çağrılır: hızlı bağlanma tutmazsa normal bağlanmaya geçer.
+// Arka planda çağrılır: bağlantı koptuysa ya da kurulamadıysa yeniden dener.
 static bool wifiKontrol() {
-  if (WiFi.status() == WL_CONNECTED) {
-    if (!rtcWifiGecerli || rtcKanal != WiFi.channel()) {
-      rtcKanal = WiFi.channel();
-      memcpy(rtcBssid, WiFi.BSSID(), 6);
-      rtcWifiGecerli = true;
-    }
-    return true;
-  }
-  if (wifiHizliDeneniyor && millis() - wifiBaslangic > 3000) {  // kanal/BSSID değişmiş
-    rtcWifiGecerli = false;
+  if (WiFi.status() == WL_CONNECTED) return true;
+  if (millis() - wifiBaslangic > 15000) {
+    Serial.println("Wi-Fi yok, yeniden baglaniliyor...");
     WiFi.disconnect();
-    wifiBaslat(false);
-  } else if (!wifiHizliDeneniyor && millis() - wifiBaslangic > 15000) {
-    WiFi.disconnect();  // takıldıysa yeniden dene
-    wifiBaslat(false);
+    wifiBaslat();
   }
   return false;
 }
@@ -227,7 +173,7 @@ static bool wifiBekle(uint32_t gosterilecek, uint32_t sureMs) {
 }
 
 static void saatiAyarla() {
-  if (time(nullptr) > 1600000000) return;  // RTC saati zaten var
+  if (time(nullptr) > 1600000000) return;  // saat zaten ayarlı
   configTime(0, 0, "pool.ntp.org", "time.google.com");
   uint32_t bas = millis();
   while (time(nullptr) < 1600000000 && millis() - bas < 3000) delay(50);
@@ -242,9 +188,11 @@ static bool yanitBasarili(const char* yanit) {
 // method: "app_segment_clean", "app_charge", "app_start"
 static bool robotaGonder(const char* method, const char* params, bool mesgulseDurdur,
                          uint32_t gosterilecek) {
+  gonderiliyor = true;
   durumLed(true);
   if (!wifiBekle(gosterilecek, 12000)) {
     Serial.println("Wi-Fi baglanamadi.");
+    gonderiliyor = false;
     return false;
   }
   ledleriGoster(gosterilecek);
@@ -254,34 +202,35 @@ static bool robotaGonder(const char* method, const char* params, bool mesgulseDu
   static WifiTransport tasima{IPAddress(ROBOT_IP)};
   static rr::Client robot(tasima, LOCAL_KEY);
 
-  if (!robot.connect((rr::Version)rtcSurum)) {
-    Serial.printf("Robota baglanilamadi: %s\n", robot.lastError());
-    return false;
-  }
-  rtcSurum = robot.version();
-  Serial.printf("Robot baglandi (protokol %s)\n", rtcSurum == rr::VL01 ? "L01" : "1.0");
-
-  // Robotun saatini ESP32'ye de al (uyku sırasında kayan saati düzeltir)
-  uint32_t rs = robot.deviceTime();
-  if (rs > 1600000000) {
-    timeval tv = {(time_t)rs, 0};
-    settimeofday(&tv, nullptr);
-  }
-
+  bool ok = false;
   static char yanit[512];
   yanit[0] = '\0';
-  Serial.printf("Komut: %s %s\n", method, params);
-  bool ok = robot.call(method, params, yanit, sizeof(yanit));
-  Serial.printf("Yanit: %s\n", ok ? yanit : robot.lastError());
+  if (!robot.connect((rr::Version)robotSurum)) {
+    Serial.printf("Robota baglanilamadi: %s\n", robot.lastError());
+  } else {
+    robotSurum = robot.version();
+    Serial.printf("Robot baglandi (protokol %s)\n", robotSurum == rr::VL01 ? "L01" : "1.0");
 
-  if (ok && !yanitBasarili(yanit) && mesgulseDurdur) {
-    Serial.println("Robot mesgul, mevcut is durduruluyor...");
-    robot.call("app_stop", "[]", yanit, sizeof(yanit));
-    delay(1500);
+    uint32_t rs = robot.deviceTime();  // robotun saatini ESP32'ye de al
+    if (rs > 1600000000) {
+      timeval tv = {(time_t)rs, 0};
+      settimeofday(&tv, nullptr);
+    }
+
+    Serial.printf("Komut: %s %s\n", method, params);
     ok = robot.call(method, params, yanit, sizeof(yanit));
     Serial.printf("Yanit: %s\n", ok ? yanit : robot.lastError());
+
+    if (ok && !yanitBasarili(yanit) && mesgulseDurdur) {
+      Serial.println("Robot mesgul, mevcut is durduruluyor...");
+      robot.call("app_stop", "[]", yanit, sizeof(yanit));
+      delay(1500);
+      ok = robot.call(method, params, yanit, sizeof(yanit));
+      Serial.printf("Yanit: %s\n", ok ? yanit : robot.lastError());
+    }
+    robot.close();
   }
-  robot.close();
+  gonderiliyor = false;
   return ok && yanitBasarili(yanit);
 }
 
@@ -302,18 +251,9 @@ static bool odalariSupur(uint32_t odalar) {
   return robotaGonder("app_segment_clean", params, MESGULSE_DURDUR, odalar);
 }
 
-// --------------------------------------------------------------------- Pil
-
-static bool pilZayif() {
-  if (PIL_PIN < 0) return false;
-  float v = analogReadMilliVolts(PIL_PIN) * PIL_BOLUCU / 1000.0f;
-  Serial.printf("Pil: %.2f V\n", v);
-  return v > 0.5f && v < PIL_DUSUK_V;  // 0.5 V altı: ölçüm bağlı değil
-}
-
 // ------------------------------------------------------------ Buton olayları
 
-static void sonucuGosterVeUyu(bool ok, uint32_t gosterilecek) {
+static void sonucuGoster(bool ok, uint32_t gosterilecek) {
   durumLed(false);
   ledleriGoster(0);
   delay(300);
@@ -321,12 +261,7 @@ static void sonucuGosterVeUyu(bool ok, uint32_t gosterilecek) {
     yanSon(gosterilecek ? gosterilecek : tumOdalar(), 2, 500, 300);
   else
     yanSon(tumOdalar(), 6, 90, 90);
-  if (pilZayif()) {
-    delay(400);
-    yanSon(tumOdalar(), 3, 900, 300);
-  }
-  secim = 0;
-  uyu();
+  hazirdaBekle();
 }
 
 static void butonaBasildi(int pin) {
@@ -343,10 +278,10 @@ static void butonaBasildi(int pin) {
   if (pin == BASLAT_PIN) {
     if (secim) {
       uint32_t s = secim;
-      sonucuGosterVeUyu(odalariSupur(s), s);
+      sonucuGoster(odalariSupur(s), s);
     } else if (BOS_BASLAT_TUM_EV) {
       Serial.println("Butun ev supuruluyor");
-      sonucuGosterVeUyu(robotaGonder("app_start", "[]", MESGULSE_DURDUR, tumOdalar()), tumOdalar());
+      sonucuGoster(robotaGonder("app_start", "[]", MESGULSE_DURDUR, tumOdalar()), tumOdalar());
     } else {
       Serial.println("Once oda sec");
       yanSon(tumOdalar(), 2, 120, 120);  // "önce oda seç"
@@ -357,7 +292,7 @@ static void butonaBasildi(int pin) {
   if (EVE_DON_PIN >= 0 && pin == EVE_DON_PIN) {
     Serial.println("Istasyona donuluyor");
     secim = 0;
-    sonucuGosterVeUyu(robotaGonder("app_charge", "[]", false, tumOdalar()), tumOdalar());
+    sonucuGoster(robotaGonder("app_charge", "[]", false, tumOdalar()), tumOdalar());
   }
 }
 
@@ -375,28 +310,18 @@ static void basilanlariIsle(uint64_t yeni) {
 void setup() {
   Serial.begin(115200);
   ledleriHazirla();
-
-  esp_sleep_wakeup_cause_t neden = esp_sleep_get_wakeup_cause();
-  uint64_t uyandiran =
-      (neden == ESP_SLEEP_WAKEUP_EXT1) ? esp_sleep_get_ext1_wakeup_status() : 0;
   butonlariHazirla();
 
-  if (neden != ESP_SLEEP_WAKEUP_EXT1) {
-    // Güç verildi / reset: LED'leri sırayla yak ("hazırım").
-    // Pil modunda uyur; adaptör modunda uyumaz, aşağıda Wi-Fi'ye bağlanır.
-    Serial.printf("Robot supurge kumandasi hazir (%s modu).\n", ADAPTOR_MODU ? "adaptor" : "pil");
-    for (size_t i = 0; i < ODA_SAYISI; i++) {
-      ledleriGoster(1UL << i);
-      delay(120);
-    }
-    ledleriGoster(0);
-    uyu();
+  Serial.println("Robot supurge kumandasi calisiyor.");
+  for (size_t i = 0; i < ODA_SAYISI; i++) {  // açılış: LED'leri sırayla yak
+    ledleriGoster(1UL << i);
+    delay(120);
   }
+  ledleriGoster(0);
 
-  wifiBaslat(true);  // seçim yapılırken arka planda bağlansın
+  wifiBaslat();
   oncekiPinler = basiliPinler();
-  sonEtkinlik = millis();
-  basilanlariIsle(uyandiran | oncekiPinler);
+  hazirdaBekle();
 }
 
 void loop() {
@@ -405,12 +330,13 @@ void loop() {
   oncekiPinler = simdi;
   if (yeni) basilanlariIsle(yeni);
 
-  wifiKontrol();
+  // Kartın mavi LED'i: Wi-Fi yokken yavaş yanıp söner
+  bool bagli = wifiKontrol();
+  if (!gonderiliyor) durumLed(!bagli && (millis() / 500) % 2);
 
-  if (millis() - sonEtkinlik > SECIM_ZAMAN_ASIMI_MS) {
-    if (secim || !ADAPTOR_MODU) Serial.println("Zaman asimi, secim silindi.");
-    secim = 0;
-    uyu();  // adaptör modunda yalnızca seçimi temizler
+  if (secim && millis() - sonEtkinlik > SECIM_ZAMAN_ASIMI_MS) {
+    Serial.println("Zaman asimi, secim silindi.");
+    hazirdaBekle();
   }
   delay(10);
 }
