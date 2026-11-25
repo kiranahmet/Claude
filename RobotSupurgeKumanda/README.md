@@ -80,18 +80,82 @@ bacağı (−) **GND**'ye gider.
 
 ## Güç: prizden mi, pille mi?
 
-**En kolayı:** Telefon şarj adaptörüyle USB'den besle. Pil derdi olmaz.
+| Yöntem | Çalışır mı? | Pil ömrü (2000 mAh) |
+|---|---|---|
+| **USB şarj adaptörü** (telefon şarj aleti) | Evet, en kolayı | Sınırsız |
+| Pil + **5V yükseltici** (MT3608, XL6009, powerbank kartı) → ESP32'nin **5V/VIN** pini | Evet | Yaklaşık **1 hafta** |
+| Pil + **ayarlı düşürücü** (LM2596, Mini-360) | **Hayır**. Tek Li-ion pil (3.0–4.2V), 3.3V çıkış için yetmez | – |
+| Pil + **AMS1117-3.3 modülü** | **Hayır**. Aynı sorun, pil yarılanınca kart kapanır | – |
+| Pil + **düşük tüketimli 3.3V regülatör** → ESP32'nin **3V3** pini | Evet, en iyisi | **Aylarca** |
 
-**Pille kullanmak istersen:** Normal ESP32 DevKit kartlarında USB çipi, voltaj
-regülatörü ve kırmızı güç LED'i uykudayken de akım çeker. 2000 mAh'lik bir pil
-bu yüzden kartına göre yaklaşık **1–3 hafta** gider. Daha uzun dayanması için:
+**Neden 5V yükseltici ile pil kısa gider?** Yükseltici kart, ESP32'nin kendi
+regülatörü ve kırmızı güç LED'i, kutu uykudayken bile sürekli akım çeker.
 
-1. 18650 pil + **TP4056** şarj modülü + **HT7333** (ya da MCP1700-3.3) regülatör kullan.
-2. Regülatörün çıkışını kartın **3V3** pinine bağla. VIN ya da 5V pinine bağlama,
-   böylece karttaki regülatör devreden çıkar.
-3. Kartın kırmızı güç LED'ini sökersen (ya da yolunu kesersen) tüketim daha da düşer.
+**Düşük tüketimli 3.3V regülatör:** HT7333 bulamazsan şunlardan herhangi biri
+aynı işi görür: **MCP1700-3302**, **XC6206P332**, **ME6211C33**, **HT7533**.
+Hepsi çok ucuz (birkaç lira) ve küçük parçalar.
 
-Bu düzenlemelerle pil aylarca dayanır.
+### Elindeki 5V yükseltici kartla bağlantı
+
+```
+18650 pil ── TP4056 (B+ / B−) ── TP4056 (OUT+ / OUT−) ── yükseltici IN+ / IN−
+                                                         yükseltici OUT+ ── ESP32 VIN (5V)
+                                                         yükseltici OUT− ── ESP32 GND
+```
+
+> **DİKKAT:** Ayarlı yükseltici kartlar 12V, hatta 28V'a kadar çıkabilir ve
+> ESP32'yi yakar. ESP32'yi bağlamadan **önce** kartın çıkışını multimetreyle ölç ve
+> üstündeki trimpotu çevirerek **5.0V**'a ayarla.
+
+Pil ömrünü uzatmak için ESP32 kartındaki kırmızı güç LED'ini sökebilirsin. Bu
+1 haftayı yaklaşık 2 haftaya çıkarır.
+
+### Düşük tüketimli regülatörle bağlantı (aylarca dayanır)
+
+```
+18650 pil ── TP4056 ── OUT+ ── regülatör IN    regülatör OUT ── ESP32 3V3 pini
+                       OUT− ── regülatör GND ─────────────────── ESP32 GND
+```
+
+Bu bağlantıda kart **VIN/5V** pininden değil, **3V3** pininden beslenir. Ayrıca
+kırmızı güç LED'ini de sök. Programlarken USB kablosu takılıysa pili çıkar.
+
+## 3D baskı kutu
+
+`kutu/` klasöründe hazır baskı dosyaları var:
+
+| Dosya | Ne |
+|---|---|
+| `govde.stl` | Alt kutu (112 × 140 × 52 mm) |
+| `kapak.stl` | Butonların takıldığı ön panel, oda adları yazılı |
+| `kutu.scad` | Düzenlenebilir tasarım (OpenSCAD) |
+
+![Kapak](kutu/resimler/kapak.png)
+
+**Kutunun özellikleri:**
+- Kapakta 6 oda butonu (12 mm), her birinin üstünde LED deliği (5 mm) ve altında oda adı yazısı var.
+- Başlat butonunun etrafında halka var, kolay bulunuyor.
+- Kapağın iç yüzünde her deliğin yanına **ESP32 pin numarası** yazılı. Kablolarken neyi nereye bağlayacağını oradan görürsün.
+- Gövdenin içinde ESP32 için 4 ayak var. Kart, altına jumper kablo sığacak yükseklikte oturur, USB girişi alttaki delikten dışarı bakar.
+- 18650 pil yuvası için kızak ve TP4056 şarj modülü için ikinci bir USB deliği var.
+- Duvara asmak için arkada 2 anahtar deliği var (vida başı en fazla 8 mm).
+- Kapak 4 adet M3 vidayla (ya da 3 mm sunta vidasıyla) kapanır. Vida boyu 10–12 mm olmalı.
+
+**Baskı ayarları:** PLA ya da PETG, 0.2 mm katman, %20 doluluk. **Destek gerekmez.**
+- Gövde: tabanı tablaya gelecek şekilde (dosyadaki gibi).
+- Kapak: yazılı yüzü tablaya gelecek şekilde (dosya zaten öyle çevrili).
+- Yazıların farklı renkte çıkmasını istersen dilimleyicide (Cura, PrusaSlicer, Bambu
+  Studio) 0.8 mm'de filament değiştir.
+
+**Ölçüleri değiştirmek için:** `kutu.scad` dosyasını ücretsiz **OpenSCAD**
+programıyla aç. *Pencere → Özelleştirici* menüsünden ayarları değiştir: buton
+çapı, kutu derinliği, kart ölçüsü, oda adları gibi. Sonra **F6** ile oluştur,
+**F7** ile STL olarak kaydet.
+
+> **Butonlarını almadan önce ölç:** Butonun kapak altında kalan boyu (kablo uçları
+> dahil) **25 mm**'den uzunsa `buton_govde` ve `derinlik` değerlerini büyüt. Butonun
+> delik çapı 12 mm değilse `buton_delik` değerini değiştir. Kapak 2.6 mm kalınlığında,
+> panel butonlarının somunu rahatça takılır.
 
 ## Kurulum (bir kez yapılır)
 
@@ -177,6 +241,7 @@ RobotSupurgeKumanda/
 │   ├── config.h                  ← SENİN AYARLARIN
 │   └── roborock_local.h/.cpp     ← Roborock yerel ağ protokolü
 ├── kurulum/kurulum.py            ← robotun IP, key ve oda numaralarını bulur
+├── kutu/                         ← 3D baskı kutu (govde.stl, kapak.stl, kutu.scad)
 └── test/                         ← testler (geliştirici için)
     ├── run_tests.sh              ← protokol testleri
     └── run_sim.sh                ← buton akışı simülasyonu
