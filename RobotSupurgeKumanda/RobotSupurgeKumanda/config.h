@@ -10,8 +10,8 @@
 #define WIFI_SSID      "EvAgi"
 #define WIFI_PASSWORD  "wifi-sifresi"
 
-// Sabit IP önerilir: pilli kullanımda bağlantıyı ~1 sn hızlandırır.
-// Kullanmak istemezsen KUMANDA_SABIT_IP satırını yorum yap.
+// Sabit IP önerilir: uyanınca Wi-Fi'ye daha hızlı bağlanır.
+// Kullanmak istemezsen KUMANDA_SABIT_IP satırının başına // koy.
 #define KUMANDA_SABIT_IP
 #define KUMANDA_IP     192, 168, 1, 250   // ağında boş bir adres
 #define AG_GECIDI      192, 168, 1, 1     // modem adresi
@@ -23,48 +23,54 @@
 #define ROBOT_IP       192, 168, 1, 50
 #define LOCAL_KEY      "xxxxxxxxxxxxxxxx" // 16 karakter, kurulum.py verir
 
-// --- Odalar: buton pini + Roborock oda (segment) numarası --------------
-// Pinler: yalnızca RTC pinleri derin uykudan uyandırabilir:
-//   32 33 25 26 27 14 13 4 (bunları kullan; 12'yi KULLANMA)
+// --- Odalar: buton pini, LED pini, Roborock oda (segment) numarası ------
+// Buton pinleri uykudan uyandırabilen pinler olmalı:
+//   32 33 25 26 27 14 13 4   (12'yi KULLANMA, basılıyken kart açılmaz)
+// LED pinleri herhangi bir çıkış pini olabilir: 23 22 21 19 18 17 16
 struct Oda {
   const char* ad;
-  uint8_t pin;
+  uint8_t butonPin;
+  uint8_t ledPin;
   uint16_t segment;
 };
 
 static const Oda ODALAR[] = {
-  {"Mutfak",        32, 16},
-  {"Oturma Odasi",  33, 17},
-  {"Salon",         25, 18},
-  {"Koridor",       26, 19},
-  {"Cocuk Odasi",   27, 20},
-  {"Yatak Odasi",   14, 21},
+  // ad              buton  LED  segment
+  {"Mutfak",          32,   23,  16},
+  {"Oturma Odasi",    33,   22,  17},
+  {"Salon",           25,   21,  18},
+  {"Koridor",         26,   19,  19},
+  {"Cocuk Odasi",     27,   18,  20},
+  {"Yatak Odasi",     14,   17,  21},
 };
 
-// "Eve Dön" butonu: robotu durdurup istasyona gönderir. İstemezsen -1 yap.
-#define EVE_DON_PIN    13
+// Başlat butonu: seçili odaları süpürmeye başlar.
+#define BASLAT_PIN     13
+
+// Eve Dön butonu: robotu durdurup istasyona gönderir. İstemezsen -1 yap.
+#define EVE_DON_PIN    4
+
+// Durum LED'i (isteğe bağlı). ESP32 DevKit'in kendi mavi LED'i: 2.
+// Komut gönderilirken yanar. İstemezsen -1 yap.
+#define DURUM_LED_PIN  2
 
 // --- Davranış ---------------------------------------------------------
-// İlk butondan sonra bu süre içinde basılan diğer odalar da aynı
-// temizliğe eklenir (örn. Mutfak + Koridor art arda bas = ikisi birden).
-#define BIRLESTIRME_MS 2500
+// Bu süre boyunca hiçbir butona basılmazsa seçim silinir, kutu uyur.
+#define SECIM_ZAMAN_ASIMI_MS 30000
+
+// Hiç oda seçmeden Başlat'a basılırsa: 1 = bütün evi süpür, 0 = bir şey yapma
+#define BOS_BASLAT_TUM_EV 0
 
 // Her oda kaç tur süpürülsün (1-3).
 #define TEKRAR_SAYISI  1
 
-// Robot zaten çalışırken yeni oda seçilirse: mevcut işi durdurup yeni
-// odaya geçsin mi? (1 = evet, 0 = hayır, hata ışığı yanar)
+// Robot zaten çalışırken Başlat'a basılırsa: mevcut işi durdurup yeni
+// odalara geçsin mi? (1 = evet, 0 = hayır, hata ışığı yanar)
 #define MESGULSE_DURDUR 1
 
-// --- Durum ışığı ------------------------------------------------------
-// Harici LED (220-330 ohm dirençle) ya da kartın kendi LED'i.
-// ESP32 DevKit dahili LED: 2 (aktif HIGH).  LOLIN D32 dahili LED: 5 (aktif LOW).
-#define LED_PIN        2
-#define LED_AKTIF      HIGH
-
 // --- Pil ölçümü (isteğe bağlı) -----------------------------------------
-// LOLIN D32'de pil ölçümü dahili olarak GPIO35'tedir (100k/100k bölücü).
-// Ölçüm yoksa -1 bırak. Pil düşükse komuttan sonra 3 uzun yanıp söner.
+// Pil + ucundan iki adet 100k dirençle bölücü yapıp ortasını GPIO35'e
+// bağlarsan pil zayıfladığında uyarı verir. Ölçüm yoksa -1 bırak.
 #define PIL_PIN        -1
 #define PIL_BOLUCU     2.0f
 #define PIL_DUSUK_V    3.45f

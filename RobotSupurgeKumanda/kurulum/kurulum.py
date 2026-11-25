@@ -26,14 +26,14 @@ try:
 except ImportError:
     sys.exit("Önce kütüphaneyi kur:  pip install python-roborock   (Python 3.11+)")
 
-# config.h'deki sıra ile aynı (pin numaraları config.h'de)
+# config.h'deki ile aynı: (ad, buton pini, LED pini)
 ODALAR = [
-    ("Mutfak", 32),
-    ("Oturma Odasi", 33),
-    ("Salon", 25),
-    ("Koridor", 26),
-    ("Cocuk Odasi", 27),
-    ("Yatak Odasi", 14),
+    ("Mutfak", 32, 23),
+    ("Oturma Odasi", 33, 22),
+    ("Salon", 25, 21),
+    ("Koridor", 26, 19),
+    ("Cocuk Odasi", 27, 18),
+    ("Yatak Odasi", 14, 17),
 ]
 
 _TR = str.maketrans("ıİçÇşŞğĞüÜöÖ", "iicCsSgGuUoO")
@@ -136,10 +136,12 @@ async def kur(cihaz):
     print(f"#define ROBOT_IP       {ip.replace('.', ', ')}")
     print(f'#define LOCAL_KEY      "{key}"')
     print("\nstatic const Oda ODALAR[] = {")
-    for ad, pin in ODALAR:
+    print("  // ad              buton  LED  segment")
+    for ad, buton, led in ODALAR:
         seg = ad_to_seg.get(sade(ad))
         yorum = "" if seg else "   // <-- eşleşmedi: yukarıdaki listeden doğru numarayı yaz"
-        print(f'  {{"{ad}",{" " * (14 - len(ad))}{pin}, {seg or 0}}},{yorum}')
+        ad_alani = f'"{ad}",'
+        print(f"  {{{ad_alani:<17} {buton:>3},   {led:>3},  {seg or 0}}},{yorum}")
     print("};")
     print("------------------------------------------------------\n")
     print("ÖNEMLİ: Modem arayüzünden robota sabit IP ver (DHCP rezervasyonu).")
