@@ -15,6 +15,7 @@ class AyarlarActivity : Activity() {
     private lateinit var odalar: EditText
     private lateinit var tekDokunus: Switch
     private lateinit var sonuc: TextView
+    private lateinit var olaylar: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +26,7 @@ class AyarlarActivity : Activity() {
         odalar = findViewById(R.id.odalar) as EditText
         tekDokunus = findViewById(R.id.tekDokunus) as Switch
         sonuc = findViewById(R.id.sonuc) as TextView
+        olaylar = findViewById(R.id.olaylar) as TextView
 
         ip.setText(Ayarlar.ip(this))
         key.setText(Ayarlar.key(this))
@@ -33,6 +35,18 @@ class AyarlarActivity : Activity() {
 
         (findViewById(R.id.kaydet) as Button).setOnClickListener { kaydet() }
         (findViewById(R.id.test) as Button).setOnClickListener { if (kaydet()) dene() }
+        (findViewById(R.id.yenile) as Button).setOnClickListener { olaylariGoster() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Uygulama her açıldığında ana ekrandaki widget'ı da yeniden çiz
+        OdaWidget.hepsiniGuncelle(this)
+        olaylariGoster()
+    }
+
+    private fun olaylariGoster() {
+        olaylar.text = Ayarlar.olaylar(this).ifBlank { "Henüz olay yok." }
     }
 
     /** Girilenleri kontrol edip kaydeder. Hata varsa false. */

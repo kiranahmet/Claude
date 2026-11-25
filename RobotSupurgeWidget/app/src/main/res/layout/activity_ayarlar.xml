@@ -112,5 +112,33 @@
             android:text="Not: Widget robota evin Wi-Fi'si üzerinden bağlanır. Telefon evin Wi-Fi'sine bağlı değilse (dışarıdayken, mobil veride) çalışmaz."
             android:textColor="#757575"
             android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                style="@android:style/TextAppearance.Material.Subhead"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Son widget olayları" />
+            <Button
+                android:id="@+id/yenile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Yenile" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/olaylar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F1F3F4"
+            android:fontFamily="monospace"
+            android:padding="8dp"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
     </LinearLayout>
 </ScrollView>

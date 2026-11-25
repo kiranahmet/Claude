@@ -57,6 +57,8 @@ robot hemen o odaya gider, BAŞLAT butonu gizlenir.
 | "Robota ulaşılamadı. Telefon evin Wi-Fi'sinde mi?" | Telefon evin Wi-Fi'sine bağlı mı? Robot IP'si doğru mu? Modem robota yeni IP vermiş olabilir: `kurulum.py`'yi tekrar çalıştır ve modemde robota sabit IP ver (DHCP rezervasyonu). |
 | "Robot cevap vermedi. Local key doğru mu?" | Key'i kontrol et. Robot sıfırlandıysa ya da uygulamaya yeniden eklendiyse key değişir. |
 | "Kurulum gerekli" | Uygulamayı aç, bilgileri girip Kaydet'e bas. |
+| Widget'a dokununca hiçbir şey olmuyor | Uygulamayı aç ve en alttaki **"Son widget olayları"** listesine bak. Dokunuşların ("Dokunuldu: Koridor" gibi) **görünmüyorsa** telefon uygulamayı engelliyor: *Ayarlar → Uygulamalar → Robot Süpürge* içinde **Otomatik başlatma**'yı aç, **Pil** ayarını **Kısıtlama yok** yap (Xiaomi/Redmi/POCO, Oppo, Realme, Vivo, Huawei'de gerekir). Sonra widget'ı ana ekrandan kaldırıp tekrar ekle. Dokunuşlar **görünüyorsa** altındaki satır ne olduğunu söyler. |
+| Odaya dokundum, robot gitmedi | Odaya dokunmak sadece **seçer** (buton maviye döner). Robotu göndermek için **BAŞLAT**'a bas. Dokununca hemen gitmesini istersen ayarlardan "Tek dokunuşla başlat"ı aç. |
 | Widget listede yok | Uygulamayı en az bir kez açtıktan sonra tekrar bak. Bazı telefonlarda widget listesi "Robot Süpürge" adının altında. |
 | Güncelleme kurulmuyor ("paket çakışıyor") | Eski sürümü kaldırıp yenisini kur. |
 

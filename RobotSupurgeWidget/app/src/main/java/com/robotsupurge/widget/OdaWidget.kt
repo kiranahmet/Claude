@@ -22,12 +22,20 @@ import java.util.Locale
 class OdaWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        Ayarlar.olayEkle(context, "Widget çizildi (${ids.size} adet)")
         val gorunum = gorunum(context)
         for (id in ids) manager.updateAppWidget(id, gorunum)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
+        val odalar = Ayarlar.odalar(context)
+        when (intent.action) {
+            EYLEM_ODA -> Ayarlar.olayEkle(context, "Dokunuldu: " +
+                (odalar.getOrNull(intent.getIntExtra(EK_ODA, -1))?.ad ?: "oda?"))
+            EYLEM_BASLAT -> Ayarlar.olayEkle(context, "Dokunuldu: BAŞLAT")
+            EYLEM_EVE_DON -> Ayarlar.olayEkle(context, "Dokunuldu: EVE DÖN")
+        }
         when (intent.action) {
             EYLEM_ODA -> odayaDokunuldu(context, intent.getIntExtra(EK_ODA, -1))
             EYLEM_BASLAT -> baslat(context)
@@ -37,7 +45,11 @@ class OdaWidget : AppWidgetProvider() {
 
     private fun odayaDokunuldu(ctx: Context, i: Int) {
         val odalar = Ayarlar.odalar(ctx)
-        if (i !in odalar.indices || Ayarlar.mesgul(ctx)) return
+        if (i !in odalar.indices) return
+        if (Ayarlar.mesgul(ctx)) {
+            Ayarlar.olayEkle(ctx, "Yok sayıldı: önceki komut hâlâ gönderiliyor")
+            return
+        }
         if (Ayarlar.tekDokunus(ctx)) {
             gonder(ctx, listOf(odalar[i]), eveDon = false)
             return
@@ -48,7 +60,8 @@ class OdaWidget : AppWidgetProvider() {
         Ayarlar.durumYaz(
             ctx,
             if (secim.isEmpty()) "Oda seç, sonra BAŞLAT'a bas."
-            else "${secim.size} oda seçili. BAŞLAT'a bas."
+            else secim.sorted().filter { it in odalar.indices }.joinToString(", ") { odalar[it].ad } +
+                " seçili. Şimdi BAŞLAT'a bas."
         )
         hepsiniGuncelle(ctx)
     }
@@ -83,6 +96,7 @@ class OdaWidget : AppWidgetProvider() {
                     RobotIslem.Sonuc(false, RobotIslem.hataMesaji(e))
                 }
                 if (sonuc.basarili) Ayarlar.secimKaydet(uygulama, emptySet())
+                Ayarlar.olayEkle(uygulama, sonuc.mesaj)
                 val saat = SimpleDateFormat("HH:mm", Locale.forLanguageTag("tr")).format(Date())
                 Ayarlar.durumYaz(uygulama, "${sonuc.mesaj}  ($saat)")
             } finally {
@@ -109,7 +123,10 @@ class OdaWidget : AppWidgetProvider() {
         fun hepsiniGuncelle(ctx: Context) {
             val manager = AppWidgetManager.getInstance(ctx)
             val ids = manager.getAppWidgetIds(ComponentName(ctx, OdaWidget::class.java))
-            if (ids.isEmpty()) return
+            if (ids.isEmpty()) {
+                Ayarlar.olayEkle(ctx, "Ana ekranda widget yok")
+                return
+            }
             val gorunum = gorunum(ctx)
             for (id in ids) manager.updateAppWidget(id, gorunum)
         }
