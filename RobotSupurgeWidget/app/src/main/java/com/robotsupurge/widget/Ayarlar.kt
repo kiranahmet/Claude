@@ -64,13 +64,13 @@ object Ayarlar {
         p(ctx).edit().putString("durum", metin).apply()
     }
 
-    /** Tanı için son widget olayları (en yenisi üstte, en fazla 15 satır). */
+    /** Tanı için son widget olayları (en yenisi üstte, en fazla 60 satır). */
     fun olaylar(ctx: Context): String = p(ctx).getString("olaylar", "") ?: ""
 
     fun olayEkle(ctx: Context, metin: String) {
         val saat = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.forLanguageTag("tr"))
             .format(java.util.Date())
-        val satirlar = (listOf("$saat  $metin") + olaylar(ctx).lines().filter { it.isNotBlank() }).take(15)
+        val satirlar = (listOf("$saat  $metin") + olaylar(ctx).lines().filter { it.isNotBlank() }).take(60)
         p(ctx).edit().putString("olaylar", satirlar.joinToString("\n")).commit()
     }
 

@@ -40,7 +40,7 @@ sed 's|<manifest xmlns:android="http://schemas.android.com/apk/res/android">|<ma
   "$KOK/app/src/main/AndroidManifest.xml" > "$B/manifest.xml"
 "$BUILD_TOOLS/aapt2" compile --dir "$KOK/app/src/main/res" -o "$B/res.zip"
 "$BUILD_TOOLS/aapt2" link -o "$B/base.apk" -I "$ANDROID_JAR" --manifest "$B/manifest.xml" --java "$B/gen" \
-  "$B/res.zip" --min-sdk-version 24 --target-sdk-version 34 --version-code 3 --version-name 1.2
+  "$B/res.zip" --min-sdk-version 24 --target-sdk-version 34 --version-code 4 --version-name 1.3
 R_JAVA="$B/gen/com/robotsupurge/widget/R.java"
 
 # 2) Kod

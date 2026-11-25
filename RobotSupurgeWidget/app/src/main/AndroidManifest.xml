@@ -23,6 +23,15 @@
             </intent-filter>
         </activity>
 
+        <!-- Widget komutlarını ön planda gönderen saydam ekran -->
+        <activity
+            android:name=".KomutActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <!-- Ana ekran widget'ı -->
         <receiver
             android:name=".OdaWidget"

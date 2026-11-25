@@ -32,7 +32,9 @@ public class IslemTest {
         s = RobotIslem.INSTANCE.odalariSupur(ip, key, List.of(new Oda("Yatak Odası", 99)));
         beklenen(!s.getBasarili() && s.getMesaj().contains("bağlanıldı ama")
             && s.getMesaj().contains("Yatak Odası (99)"), "olmayan oda dogru mesaj: " + s.getMesaj());
-        System.out.println("     (sure " + (System.currentTimeMillis() - t0) + " ms)");
+        System.out.println("     (sure " + (System.currentTimeMillis() - t0) + " ms), adim kaydi:\n" + s.getIz());
+        beklenen(s.getIz().contains("merhaba cevabı geldi") && s.getIz().contains("cevap gelmedi"),
+            "adim kaydi baglantinin kuruldugunu ve komutun cevapsiz kaldigini gosteriyor");
 
         // Bağlantı testi: haritada olmayan numaraları uyarır
         s = RobotIslem.INSTANCE.durumOku(ip, key, odalar);

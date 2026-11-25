@@ -86,7 +86,8 @@ class AyarlarActivity : Activity() {
         val odaListesi = Ayarlar.odalar(this)
         Thread {
             val mesaj = try {
-                RobotIslem.durumOku(ipMetni, keyMetni, odaListesi).mesaj
+                val s = RobotIslem.durumOku(ipMetni, keyMetni, odaListesi)
+                s.mesaj + (if (!s.basarili && s.iz.isNotBlank()) "\n\nAyrıntı:\n" + s.iz else "")
             } catch (e: Exception) {
                 RobotIslem.hataMesaji(e)
             }

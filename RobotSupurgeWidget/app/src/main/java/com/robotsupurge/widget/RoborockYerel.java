@@ -60,6 +60,21 @@ public final class RoborockYerel {
     private InputStream giris;
     private OutputStream cikis;
     private final ByteArrayOutputStream tampon = new ByteArrayOutputStream();
+    private final StringBuilder iz = new StringBuilder();
+
+    /** Tanı için adım adım ne olduğunun kaydı (bağlantı, merhaba, komut, gelen mesajlar). */
+    public String iz() {
+        return iz.toString().trim();
+    }
+
+    private void izEkle(String s) {
+        if (iz.length() < 3000) iz.append("  · ").append(s).append('\n');
+    }
+
+    private static String kisalt(String s) {
+        s = s.replace('\n', ' ');
+        return s.length() > 90 ? s.substring(0, 90) + "…" : s;
+    }
 
     public RoborockYerel(String ip, String localKey) {
         this(ip, PORT, localKey);
@@ -86,7 +101,7 @@ public final class RoborockYerel {
     public String komut(String method, String paramsJson) throws IOException {
         baglan();
         try {
-            return cagir(method, paramsJson, 8000);
+            return cagir(method, paramsJson, 10000);
         } finally {
             kapat();
         }
@@ -109,6 +124,7 @@ public final class RoborockYerel {
                 tercihL01 = v;
                 return;
             } catch (IOException e) {
+                izEkle("olmadı: " + e.getClass().getSimpleName() + " " + e.getMessage());
                 son = e;
                 kapat();
             }
@@ -120,6 +136,7 @@ public final class RoborockYerel {
         soket = new Socket();
         soket.connect(new InetSocketAddress(ip, port), 4000);
         soket.setTcpNoDelay(true);
+        izEkle("TCP bağlandı " + ip + ":" + port);
         giris = soket.getInputStream();
         cikis = soket.getOutputStream();
         tampon.reset();
@@ -139,7 +156,9 @@ public final class RoborockYerel {
         connectNonce = 10000 + rnd.nextInt(22768);
         cikis.write(cerceve(1, connectNonce, simdi(), HELLO_REQUEST, null));
         cikis.flush();
+        izEkle("merhaba gönderildi (" + (v ? "L01" : "1.0") + ")");
         Mesaj m = bekle(HELLO_RESPONSE, 1, 0, zamanAsimi);
+        izEkle("merhaba cevabı geldi");
         ackNonce = m.random;
         ackVar = true;
     }
@@ -155,9 +174,13 @@ public final class RoborockYerel {
         int random = 10000 + rnd.nextInt(90000);
         cikis.write(cerceve(seq, random, ts, GENERAL_REQUEST, govde.getBytes(StandardCharsets.UTF_8)));
         cikis.flush();
+        izEkle("komut gönderildi: " + method + " " + paramsJson + " (id " + id + ")");
         try {
-            return bekle(-1, 0, id, zamanAsimi).icYanit;
+            String yanit = bekle(-1, 0, id, zamanAsimi).icYanit;
+            izEkle("cevap: " + kisalt(yanit));
+            return yanit;
         } catch (SocketTimeoutException e) {
+            izEkle((zamanAsimi / 1000) + " sn içinde cevap gelmedi");
             throw new KomutCevapsiz(method);
         }
     }
@@ -254,6 +277,10 @@ public final class RoborockYerel {
         while (true) {
             Mesaj m;
             while ((m = coz()) != null) {
+                if (protokol < 0) {
+                    izEkle("gelen: " + m.surum + " prot " + m.protokol + " "
+                            + (m.icerik == null ? "(içeriksiz/çözülemedi)" : kisalt(new String(m.icerik, StandardCharsets.UTF_8))));
+                }
                 if (protokol >= 0 && m.protokol == protokol && m.seq == seq) return m;
                 if (rpcId != 0 && m.icerik != null) {
                     String ic = jsonString(new String(m.icerik, StandardCharsets.UTF_8), "102");
@@ -273,7 +300,10 @@ public final class RoborockYerel {
             } catch (SocketTimeoutException e) {
                 throw new SocketTimeoutException("Robottan yanıt gelmedi");
             }
-            if (n < 0) throw new IOException("Robot bağlantıyı kapattı");
+            if (n < 0) {
+                izEkle("robot bağlantıyı kapattı");
+                throw new IOException("Robot bağlantıyı kapattı");
+            }
             tampon.write(okunan, 0, n);
         }
     }
