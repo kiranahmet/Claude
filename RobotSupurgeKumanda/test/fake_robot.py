@@ -115,6 +115,11 @@ def serve(port, mode, key, hello_fmt="len0crc", mesgul=""):
                     )
                     conn.sendall(build(push, key, connect_nonce, ack_nonce))
                     result = {"id": inner["id"], "result": ["ok"]}
+                    params = inner.get("params") or [{}]
+                    if inner["method"] == "app_segment_clean" and 99 in (params[0].get("segments") or []):
+                        continue  # haritada olmayan oda: gerçek robot gibi hiç cevap verme
+                    if inner["method"] == "get_room_mapping":
+                        result = {"id": inner["id"], "result": [[16, "1001", 14], [17, "1002", 2]]}
                     if inner["method"] == "app_stop":
                         mesgul_kaldi = False
                     elif inner["method"] == "app_segment_clean" and mesgul_kaldi:

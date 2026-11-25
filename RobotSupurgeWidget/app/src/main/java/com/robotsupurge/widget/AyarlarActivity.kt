@@ -83,9 +83,10 @@ class AyarlarActivity : Activity() {
         sonuc.text = "Robota bağlanılıyor…"
         val ipMetni = Ayarlar.ip(this)
         val keyMetni = Ayarlar.key(this)
+        val odaListesi = Ayarlar.odalar(this)
         Thread {
             val mesaj = try {
-                RobotIslem.durumOku(ipMetni, keyMetni).mesaj
+                RobotIslem.durumOku(ipMetni, keyMetni, odaListesi).mesaj
             } catch (e: Exception) {
                 RobotIslem.hataMesaji(e)
             }

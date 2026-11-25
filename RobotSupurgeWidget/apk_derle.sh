@@ -8,6 +8,7 @@
 #   KEYSTORE     imza anahtarı (yoksa oluşturulur), KEYSTORE_PASS şifresi
 # İsteğe bağlı:
 #   ONCEDEN_KEY  local key'i uygulamaya önceden yazar (bu APK'yı paylaşma!)
+#   ONCEDEN_ODALAR  örnek oda listesi yerine bu liste gelir ("Mutfak = 22\nSalon = 23" gibi)
 #   CIKIS        çıktı dosyası (varsayılan: RobotSupurgeWidget.apk)
 set -euo pipefail
 KOK=$(cd "$(dirname "$0")" && pwd)
@@ -22,13 +23,24 @@ if [ -n "${ONCEDEN_KEY:-}" ]; then
   sed -i "s|private const val ORNEK_KEY = \"\"|private const val ORNEK_KEY = \"$ONCEDEN_KEY\"|" "$B/src/Ayarlar.kt"
   grep -q "$ONCEDEN_KEY" "$B/src/Ayarlar.kt"
 fi
+if [ -n "${ONCEDEN_ODALAR:-}" ]; then
+  python3 - "$B/src/Ayarlar.kt" "$ONCEDEN_ODALAR" <<'PY'
+import re, sys
+p, odalar = sys.argv[1], sys.argv[2].replace('"', '')
+s = open(p, encoding="utf-8").read()
+# lambda: değiştirme metnindeki \n kaçışı Kotlin'e olduğu gibi (\n olarak) gitsin
+s2 = re.sub(r'const val ORNEK_ODALAR = ".*"', lambda m: 'const val ORNEK_ODALAR = "' + odalar + '"', s)
+assert s2 != s
+open(p, "w", encoding="utf-8").write(s2)
+PY
+fi
 
 # 1) Kaynaklar (namespace, Gradle'da olduğu gibi manifest'e eklenir)
 sed 's|<manifest xmlns:android="http://schemas.android.com/apk/res/android">|<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.robotsupurge.widget">|' \
   "$KOK/app/src/main/AndroidManifest.xml" > "$B/manifest.xml"
 "$BUILD_TOOLS/aapt2" compile --dir "$KOK/app/src/main/res" -o "$B/res.zip"
 "$BUILD_TOOLS/aapt2" link -o "$B/base.apk" -I "$ANDROID_JAR" --manifest "$B/manifest.xml" --java "$B/gen" \
-  "$B/res.zip" --min-sdk-version 24 --target-sdk-version 34 --version-code 2 --version-name 1.1
+  "$B/res.zip" --min-sdk-version 24 --target-sdk-version 34 --version-code 3 --version-name 1.2
 R_JAVA="$B/gen/com/robotsupurge/widget/R.java"
 
 # 2) Kod

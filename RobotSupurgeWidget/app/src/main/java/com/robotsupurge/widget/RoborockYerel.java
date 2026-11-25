@@ -35,6 +35,16 @@ public final class RoborockYerel {
     private static final int HEADER = 17;  // sürüm(3) seq(4) random(4) zaman(4) protokol(2)
     private static final int HELLO_REQUEST = 0, HELLO_RESPONSE = 1, GENERAL_REQUEST = 4;
 
+    /** Robota bağlanıldı (merhaba tamam) ama gönderilen komuta cevap gelmedi. */
+    public static final class KomutCevapsiz extends SocketTimeoutException {
+        public final String method;
+
+        KomutCevapsiz(String method) {
+            super("Robot '" + method + "' komutuna cevap vermedi");
+            this.method = method;
+        }
+    }
+
     /** Robotun konuştuğu protokol; ilk başarılı bağlantıdan sonra hatırlanır. */
     private static volatile boolean tercihL01 = false;
 
@@ -76,7 +86,7 @@ public final class RoborockYerel {
     public String komut(String method, String paramsJson) throws IOException {
         baglan();
         try {
-            return cagir(method, paramsJson, 6000);
+            return cagir(method, paramsJson, 8000);
         } finally {
             kapat();
         }
@@ -145,7 +155,11 @@ public final class RoborockYerel {
         int random = 10000 + rnd.nextInt(90000);
         cikis.write(cerceve(seq, random, ts, GENERAL_REQUEST, govde.getBytes(StandardCharsets.UTF_8)));
         cikis.flush();
-        return bekle(-1, 0, id, zamanAsimi).icYanit;
+        try {
+            return bekle(-1, 0, id, zamanAsimi).icYanit;
+        } catch (SocketTimeoutException e) {
+            throw new KomutCevapsiz(method);
+        }
     }
 
     // -------------------------------------------------------------- çerçeve
