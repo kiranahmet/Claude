@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Robota ev Wi-Fi'si üzerinden (TCP 58867) bağlanmak için -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@drawable/ic_robot"
+        android:roundIcon="@drawable/ic_robot"
+        android:label="@string/app_adi"
+        android:supportsRtl="false"
+        android:theme="@style/Tema">
+
+        <!-- Ayar ekranı: robot IP'si, local key, oda listesi -->
+        <activity
+            android:name=".AyarlarActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Ana ekran widget'ı -->
+        <receiver
+            android:name=".OdaWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/oda_widget_info" />
+        </receiver>
+    </application>
+</manifest>

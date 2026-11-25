@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ana ekran widget'ı: en fazla 8 oda butonu + Başlat + Eve Dön -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/kok"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_arka"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:id="@+id/baslik"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="4dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/app_adi"
+            android:textColor="@color/yazi"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/durum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="@color/yazi_soluk"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/satir0"
+        style="@style/WidgetSatir">
+        <TextView android:id="@+id/oda0" style="@style/WidgetOda" />
+        <TextView android:id="@+id/oda1" style="@style/WidgetOda" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/satir1"
+        style="@style/WidgetSatir">
+        <TextView android:id="@+id/oda2" style="@style/WidgetOda" />
+        <TextView android:id="@+id/oda3" style="@style/WidgetOda" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/satir2"
+        style="@style/WidgetSatir">
+        <TextView android:id="@+id/oda4" style="@style/WidgetOda" />
+        <TextView android:id="@+id/oda5" style="@style/WidgetOda" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/satir3"
+        style="@style/WidgetSatir">
+        <TextView android:id="@+id/oda6" style="@style/WidgetOda" />
+        <TextView android:id="@+id/oda7" style="@style/WidgetOda" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/WidgetSatir">
+        <TextView
+            android:id="@+id/baslat"
+            style="@style/WidgetOda"
+            android:background="@drawable/baslat"
+            android:text="@string/baslat"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/eveDon"
+            style="@style/WidgetOda"
+            android:background="@drawable/eve_don"
+            android:text="@string/eve_don"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_arka">#E61C2530</color>
+    <color name="oda">#26FFFFFF</color>
+    <color name="oda_kenar">#40FFFFFF</color>
+    <color name="oda_secili">#1E88E5</color>
+    <color name="baslat">#2E7D32</color>
+    <color name="eve_don">#546E7A</color>
+    <color name="yazi">#FFFFFF</color>
+    <color name="yazi_soluk">#B3FFFFFF</color>
+    <color name="vurgu">#1E88E5</color>
+</resources>

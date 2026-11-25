@@ -4,7 +4,7 @@
 yani ESP32 kodunun ürettiği paketler gerçek kütüphaneyle birebir uyumlu mu,
 bunu doğrular.
 
-Kullanım: python fake_robot.py <port> <v1|l01> <local_key> [bare|len0crc|crc]
+Kullanım: python fake_robot.py <port> <v1|l01> <local_key> [bare|len0crc|crc] [mesgul]
 Her bağlantıda alınan RPC komutlarını JSON satırı olarak stdout'a yazar.
 """
 
@@ -80,7 +80,10 @@ def hello_response(version, ack_nonce, fmt):
     return len(body).to_bytes(4, "big") + body
 
 
-def serve(port, mode, key, hello_fmt="len0crc"):
+def serve(port, mode, key, hello_fmt="len0crc", mesgul=""):
+    # mesgul="mesgul": robot başka işteymiş gibi ilk süpürme komutunu hatayla
+    # reddeder; app_stop geldikten sonra kabul eder.
+    mesgul_kaldi = mesgul == "mesgul"
     srv = socket.socket()
     srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     srv.bind(("127.0.0.1", port))
@@ -112,6 +115,10 @@ def serve(port, mode, key, hello_fmt="len0crc"):
                     )
                     conn.sendall(build(push, key, connect_nonce, ack_nonce))
                     result = {"id": inner["id"], "result": ["ok"]}
+                    if inner["method"] == "app_stop":
+                        mesgul_kaldi = False
+                    elif inner["method"] == "app_segment_clean" and mesgul_kaldi:
+                        result = {"id": inner["id"], "error": {"code": -10007, "message": "invalid status"}}
                     resp = RoborockMessage(
                         protocol=RoborockMessageProtocol.GENERAL_RESPONSE,
                         version=version,
@@ -125,4 +132,4 @@ def serve(port, mode, key, hello_fmt="len0crc"):
 
 
 if __name__ == "__main__":
-    serve(int(sys.argv[1]), sys.argv[2], sys.argv[3], *sys.argv[4:5])
+    serve(int(sys.argv[1]), sys.argv[2], sys.argv[3], *sys.argv[4:6])

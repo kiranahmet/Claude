@@ -7,6 +7,9 @@ LED yanar, **Başlat**'a basınca robot seçtiğin odaları süpürür.
 - ESP32 robota **ev ağı üzerinden doğrudan** komut verir (bulutsuz, hızlı).
 - Kart: **ESP32-WROOM-32U DevKit**. Güç: **USB şarj adaptörü** (telefon şarj aleti).
 
+**Telefon widget'ı (Android):** Aynı işi telefonun ana ekranından yapan widget için
+[`../RobotSupurgeWidget`](../RobotSupurgeWidget/README.md) klasörüne bak.
+
 **Yazdırmak için bağlantı şeması:** [`semalar/baglanti_semasi.pdf`](semalar/baglanti_semasi.pdf) (tek A4 sayfa)
 
 ## Kullanım

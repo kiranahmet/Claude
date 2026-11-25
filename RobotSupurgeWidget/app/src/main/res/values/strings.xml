@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_adi">Robot Süpürge</string>
+    <string name="widget_aciklama">Odaları seç, Başlat\'a bas: robot seçtiğin odaları süpürür.</string>
+    <string name="baslat">BAŞLAT</string>
+    <string name="eve_don">EVE DÖN</string>
+</resources>
