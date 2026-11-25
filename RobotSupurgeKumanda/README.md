@@ -80,7 +80,26 @@ bacağı (−) **GND**'ye gider.
   için 17 yerine **5** kullan ve `config.h`'de de değiştir.
 - Kartın üstündeki mavi LED (GPIO2) komut gönderilirken yanar.
 
-## Güç: 18650 pil + TP4056 + MT3608
+## Güç: adaptör ya da pil
+
+İki seçenek var. İkisinin de bağlantı şeması tek A4 sayfada:
+**[`semalar/baglanti_semalari.pdf`](semalar/baglanti_semalari.pdf)** (üstte adaptörlü, altta pilli).
+Butonların ve LED'lerin bağlantısı ikisinde de aynı, sadece güç kısmı farklı.
+
+| | Adaptörlü | Pilli |
+|---|---|---|
+| Ne gerekir | USB şarj adaptörü (5V, en az 1A) | 18650 + TP4056 + MT3608 |
+| `config.h` | `#define ADAPTOR_MODU 1` | `#define ADAPTOR_MODU 0` |
+| Kutu gövdesi | `govde_adaptor.stl` | `govde_pilli.stl` |
+| Davranış | Hiç uyumaz, Wi-Fi hep açık, Başlat'a basınca robot anında çıkar | Boştayken uyur, butona basınca 1–2 sn'de uyanır |
+| Şarj | Gerekmez | Haftada bir |
+
+### Adaptörlü
+
+ESP32'nin USB girişine telefon şarj aletini tak, başka bir şey gerekmez. `config.h`'de
+`ADAPTOR_MODU`'nu `1` yap. Kapak her iki sürümde de aynı (`kapak.stl`).
+
+### Pilli: 18650 + TP4056 + MT3608
 
 ```
                  TP4056 şarj modülü            MT3608 yükseltici          ESP32
@@ -111,7 +130,7 @@ ESP32 kartındaki kırmızı güç LED'ini sökersen ya da yolunu kesersen bu s�
 **Programlarken:** ESP32'ye USB kablosu takacağın zaman pili çıkar (ya da MT3608'in
 çıkış kablosunu ayır). Aynı anda iki kaynaktan beslemek karta zarar verebilir.
 
-### Pil uyarısı (önerilir)
+#### Pil uyarısı (önerilir)
 
 Haftada bir şarj gerekeceği için pil uyarısını açmanı öneririm. İki adet **100 kΩ**
 dirençle bölücü yap:
@@ -141,7 +160,8 @@ tüm LED'ler 3 kez uzun yanar. Bölücü çok az akım çeker (0.02 mA), pil öm
 
 | Dosya | Ne |
 |---|---|
-| `govde.stl` | Alt kutu (112 × 140 × 52 mm) |
+| `govde_pilli.stl` | Alt kutu, pilli sürüm (112 × 140 × 52 mm): pil kızağı ve şarj deliği var |
+| `govde_adaptor.stl` | Alt kutu, adaptörlü sürüm: pil kızağı ve şarj deliği yok |
 | `kapak.stl` | Butonların takıldığı ön panel, oda adları yazılı |
 | `kutu.scad` | Düzenlenebilir tasarım (OpenSCAD) |
 
@@ -231,6 +251,7 @@ başladığında robot yeni bir IP alabilir ve kumanda çalışmayı bırakır.
 
 | Ayar | Ne işe yarar |
 |---|---|
+| `ADAPTOR_MODU` | 1 = prizden besleniyor (hiç uyumaz), 0 = pille çalışıyor (boştayken uyur) |
 | `SECIM_ZAMAN_ASIMI_MS` | Bu kadar milisaniye butona basılmazsa seçim silinir ve kutu uyur (varsayılan 30000 = 30 sn) |
 | `BOS_BASLAT_TUM_EV` | Oda seçmeden Başlat'a basılırsa: 1 = bütün evi süpürür, 0 = hiçbir şey yapmaz |
 | `TEKRAR_SAYISI` | Her oda kaç tur süpürülsün (1–3) |
@@ -260,7 +281,8 @@ RobotSupurgeKumanda/
 │   ├── config.h                  ← SENİN AYARLARIN
 │   └── roborock_local.h/.cpp     ← Roborock yerel ağ protokolü
 ├── kurulum/kurulum.py            ← robotun IP, key ve oda numaralarını bulur
-├── kutu/                         ← 3D baskı kutu (govde.stl, kapak.stl, kutu.scad)
+├── kutu/                         ← 3D baskı kutu (gövde ×2, kapak, kutu.scad)
+├── semalar/                      ← bağlantı şemaları (A4 PDF, yazdırmak için)
 └── test/                         ← testler (geliştirici için)
     ├── run_tests.sh              ← protokol testleri
     └── run_sim.sh                ← buton akışı simülasyonu

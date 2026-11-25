@@ -49,4 +49,21 @@ senaryo "Oda secmeden Baslat (bir sey olmamali), sonra Oturma Odasi + Baslat" \
 senaryo "Butun odalari sec + Baslat" '"segments": [16, 17, 18, 19, 20, 21]' \
   32 33@300 25@600 26@900 27@1200 14@1500 13@1900
 senaryo "Pil takildi (buton yok) -> robota gitmeden uyu" - -1
+
+# --- Adaptör modu: kutu hiç uyumamalı, arka arkaya iki temizlik başlatılabilmeli
+g++ -std=gnu++17 -Wall -Wextra -O1 -DADAPTOR_MODU=1 -Isim -I../RobotSupurgeKumanda -o "$TMP/sim_adaptor" \
+  "$TMP/sketch.cpp" sim/sim_main.cpp ../RobotSupurgeKumanda/roborock_local.cpp -lmbedcrypto
+port=$((40000 + RANDOM % 20000))
+$PY fake_robot.py "$port" v1 "$KEY" >"$TMP/robot.log" 2>&1 &
+pid=$!
+for _ in $(seq 50); do grep -q ready "$TMP/robot.log" && break; sleep 0.1; done
+# Güç verildi (-1), Mutfak + Başlat, sonra Salon + Yatak + Başlat
+timeout 9 "$TMP/sim_adaptor" "$port" -1 32@1000 13@1400 25@5000 14@5400 13@5800 >"$TMP/sim.log" 2>&1 || true
+sleep 0.2; kill "$pid" 2>/dev/null || true
+if ! grep -q "^UYKU" "$TMP/sim.log" && grep -qF '"segments": [16]' "$TMP/robot.log" \
+   && grep -qF '"segments": [18, 21]' "$TMP/robot.log"; then
+  echo "OK   Adaptor modu: hic uyumadan arka arkaya iki temizlik"
+else
+  echo "FAIL Adaptor modu"; cat "$TMP/sim.log"; cat "$TMP/robot.log"; fail=1
+fi
 exit $fail

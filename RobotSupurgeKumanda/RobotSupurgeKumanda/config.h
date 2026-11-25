@@ -6,6 +6,14 @@
 #pragma once
 #include <stdint.h>
 
+// --- Güç kaynağı -------------------------------------------------------
+// 1 = USB adaptör (prizden): kutu hiç uyumaz, Wi-Fi hep bağlı kalır,
+//     Başlat'a basınca robot anında yola çıkar.
+// 0 = pil (18650 + TP4056 + MT3608): boştayken derin uykuya geçer.
+#ifndef ADAPTOR_MODU
+#define ADAPTOR_MODU   0
+#endif
+
 // --- Wi-Fi (2.4 GHz ağ olmalı; ESP32 5 GHz'e bağlanamaz) -------------
 #define WIFI_SSID      "EvAgi"
 #define WIFI_PASSWORD  "wifi-sifresi"

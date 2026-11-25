@@ -6,8 +6,9 @@
 //   2. BAŞLAT'a bas: robot seçili odaları süpürmeye gider.
 //   3. EVE DÖN: robot ne yapıyorsa bırakır, istasyona döner.
 //
-// Kutu boştayken derin uykudadır; herhangi bir butona basınca uyanır.
-// 30 sn hiçbir şeye basılmazsa seçim silinir ve tekrar uyur.
+// Pil modunda kutu boştayken derin uykudadır; herhangi bir butona basınca
+// uyanır. 30 sn hiçbir şeye basılmazsa seçim silinir ve tekrar uyur.
+// Adaptör modunda (config.h: ADAPTOR_MODU 1) hiç uyumaz, hep hazırdır.
 //
 // LED kodları:
 //   seçili odaların LED'leri yanıp sönüyor : komut gönderiliyor
@@ -139,6 +140,14 @@ static void butonlariHazirla() {
 // --------------------------------------------------------------------- Uyku
 
 static void uyu() {
+  if (ADAPTOR_MODU) {
+    // Prizden besleniyor: uyumaya gerek yok, Wi-Fi açık kalsın, hazırda bekle.
+    secim = 0;
+    ledleriGoster(0);
+    durumLed(false);
+    sonEtkinlik = millis();
+    return;
+  }
   WiFi.disconnect(true);
   WiFi.mode(WIFI_OFF);
   ledleriGoster(0);
@@ -373,8 +382,9 @@ void setup() {
   butonlariHazirla();
 
   if (neden != ESP_SLEEP_WAKEUP_EXT1) {
-    // Pil takıldı / reset: LED'leri sırayla yak ("hazırım") ve uyu
-    Serial.println("Robot supurge kumandasi hazir.");
+    // Güç verildi / reset: LED'leri sırayla yak ("hazırım").
+    // Pil modunda uyur; adaptör modunda uyumaz, aşağıda Wi-Fi'ye bağlanır.
+    Serial.printf("Robot supurge kumandasi hazir (%s modu).\n", ADAPTOR_MODU ? "adaptor" : "pil");
     for (size_t i = 0; i < ODA_SAYISI; i++) {
       ledleriGoster(1UL << i);
       delay(120);
@@ -398,9 +408,9 @@ void loop() {
   wifiKontrol();
 
   if (millis() - sonEtkinlik > SECIM_ZAMAN_ASIMI_MS) {
-    Serial.println("Zaman asimi, secim silindi.");
+    if (secim || !ADAPTOR_MODU) Serial.println("Zaman asimi, secim silindi.");
     secim = 0;
-    uyu();
+    uyu();  // adaptör modunda yalnızca seçimi temizler
   }
   delay(10);
 }
