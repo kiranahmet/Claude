@@ -73,7 +73,7 @@ def direnc(s, x1, y, x2, etiket):
 
 def led(s, x, y, isaret=False):
     """Anot solda (x), katot sağda (x+5)."""
-    s.add(f'<polygon points="{x},{y - 2.6} {x},{y + 2.6} {x + 5},{y}" fill="#ffe082" stroke="{SIYAH}" stroke-width="0.4"/>')
+    s.add(f'<polygon points="{x},{y - 2.6} {x},{y + 2.6} {x + 5},{y}" fill="#81c784" stroke="{SIYAH}" stroke-width="0.4"/>')
     s.cizgi([(x + 5, y - 2.6), (x + 5, y + 2.6)], SIYAH, 0.5)
     for dx in (1.5, 3.5):
         s.cizgi([(x + dx, y - 3), (x + dx + 2, y - 5)], "#e65100", 0.35)
@@ -125,14 +125,14 @@ def sema():
         y = oda_y(i)
         pin(s, x2, y, f"GPIO{l}", sag=True)
         s.cizgi([(x2, y), (124, y)], MAVI)
-        direnc(s, 124, y, 136, "330 Ω *")
+        direnc(s, 124, y, 136, "220 Ω")
         s.cizgi([(136, y), (146, y)], MAVI)
         led(s, 146, y, isaret=(i == 0))
         s.cizgi([(151, y), (BUS_GND, y)], SIYAH)
         if i < 5:
             s.nokta(BUS_GND, y)
         s.yazi(155, y - 1.4, ad, 2.4, "start", "#111")
-    s.yazi(124, oda_y(5) + 7, "* Direnç LED rengine göre: aşağıdaki tabloya bak.", 2.2, "start", GRI)
+    s.yazi(124, oda_y(5) + 7, "Yeşil LED + 220 Ω. Başka renk: aşağıdaki tablo.", 2.2, "start", GRI)
 
     # USB ve adaptör
     s.kutu(91, y2, 101, y2 + 4, "#455a64", "#263238", 0.5, 0.3)
@@ -164,7 +164,7 @@ SAYFA = """<!doctype html>
   h1 {{ font-size: 15pt; margin: 0; }}
   .alt {{ color: #555; font-size: 9pt; margin: 0.5mm 0 1.5mm; }}
   h3 {{ font-size: 10pt; margin: 0 0 1.2mm; }}
-  svg {{ display: block; width: 186mm; height: auto; margin: 0 auto; }}
+  svg {{ display: block; width: 180mm; height: auto; margin: 0 auto; }}
   .ikili {{ display: flex; gap: 5mm; margin-top: 1.5mm; }}
   .ikili > div {{ flex: 1; }}
   table {{ border-collapse: collapse; width: 100%; }}
@@ -185,7 +185,8 @@ SAYFA = """<!doctype html>
   code {{ font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; background: #f1f3f4; padding: 0 0.6mm; }}
 </style></head><body>
 <h1>Robot Süpürge Kumandası — Bağlantı Şeması</h1>
-<div class="alt">Roborock S8 • ESP32-WROOM-32U DevKit • USB şarj adaptörüyle beslenir</div>
+<div class="alt">ESP32-WROOM-32U • USB adaptör • yeşil LED • hazır kutu
+  <span style="float:right;font-weight:bold;color:#c62828">GÜNCEL: 27.11.2026</span></div>
 {sema}
 <div class="ikili">
   <div>
@@ -196,8 +197,8 @@ SAYFA = """<!doctype html>
     <h3>LED direnci (LED rengine göre)</h3>
     <table>
       <tr><th>LED rengi</th><th>Direnç</th></tr>
+      <tr style="background:#e8f5e9;font-weight:bold"><td>Yeşil (önerilen)</td><td>220 Ω</td></tr>
       <tr><td>Kırmızı, sarı, turuncu</td><td>330 Ω</td></tr>
-      <tr><td>Yeşil</td><td>220 Ω</td></tr>
       <tr><td>Mavi, beyaz</td><td>68–100 Ω</td></tr>
     </table>
     <div class="dikkat" style="margin-top:2mm">
@@ -219,9 +220,9 @@ SAYFA = """<!doctype html>
       <li><span class="kutucuk"></span>Modemden robota sabit IP ver (DHCP rezervasyonu).</li>
       <li><span class="kutucuk"></span><code>config.h</code>: Wi-Fi adı/şifresi + kurulum satırları.</li>
       <li><span class="kutucuk"></span>Arduino IDE → kart: <b>ESP32 Dev Module</b> → Yükle.</li>
-      <li><span class="kutucuk"></span>Kutuyu bas: <code>govde.stl</code> + <code>kapak.stl</code>.</li>
+      <li><span class="kutucuk"></span>Kutuyu del: 8 × 12 mm (buton), 6 × 5 mm (LED), yanda USB kablosu.</li>
       <li><span class="kutucuk"></span>Butonları, LED'leri kapağa tak, bu şemaya göre kablola.</li>
-      <li><span class="kutucuk"></span>Kartı ayaklara yerleştir, anteni tak, kapağı 4 vidayla kapat.</li>
+      <li><span class="kutucuk"></span>Kartı kutunun dibine köpük bantla yapıştır, anteni tak, kapağı kapat.</li>
       <li><span class="kutucuk"></span>Adaptörü tak → LED'ler sırayla yanarsa hazır.</li>
     </ol>
   </div>
